@@ -3,14 +3,16 @@ from ._reflexxes_type2 import (
     ReflexxesAPI,
     RMLBoolVector,
     RMLDoubleVector,
+    RMLFlags,
+    RMLInputParameters,
     RMLIntVector,
+    RMLOutputParameters,
     RMLPositionFlags,
     RMLPositionInputParameters,
     RMLPositionOutputParameters,
     RMLVelocityFlags,
     RMLVelocityInputParameters,
     RMLVelocityOutputParameters,
-
 )
 
 

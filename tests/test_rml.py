@@ -1,5 +1,5 @@
 import unittest
-from reflexxes_type2 import *
+from reflexxes import *
 
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
