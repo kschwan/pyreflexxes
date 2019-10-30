@@ -28,6 +28,7 @@ class PositionTrajectoryGenerator(object):
         assert len(max_acceleration) == n_dof
 
         self.n_dof = n_dof
+        self.cycle_time = cycle_time
         self.rml = ReflexxesAPI(n_dof, cycle_time)
         self.ip = RMLPositionInputParameters(n_dof)
         self.op = RMLPositionOutputParameters(n_dof)
