@@ -15,37 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <ReflexxesAPI.h>
+
 #include <boost/noncopyable.hpp>
 #include <boost/python.hpp>
 
-#include <ReflexxesAPI.h>
-
 namespace py = boost::python;
-
-// Copy RMLVector elements to Python list
-template<typename T>
-auto to_list(const RMLVector<T>& v)
-{
-    py::list list;
-
-    for (unsigned i = 0; i < v.VectorDimension; ++i) {
-        list.append(v.VecData[i]);
-    }
-
-    return list;
-}
-
-// Copy RMLDoubleVectors to Python list
-auto to_list(RMLDoubleVector** vv, unsigned n)
-{
-    py::list list;
-
-    for (unsigned i = 0; i < n; ++i) {
-        list.append(*vv[i]);
-    }
-
-    return list;
-}
 
 // Print RMLVector to output steam (used by __repr__ / __str__)
 template<typename T>
@@ -72,27 +47,65 @@ struct RMLVectorName<RMLVector<bool>>
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const RMLVector<T>& v)
 {
-    os << RMLVectorName<RMLVector<T>>::value() << "(";
+    os << RMLVectorName<RMLVector<T>>::value() << "([";
 
     for (unsigned i = 0; i < v.VectorDimension - 1; ++i) {
         os << v.VecData[i] << ", ";
     }
 
-    os << v.VecData[v.VectorDimension - 1] << ")";
+    os << v.VecData[v.VectorDimension - 1] << "])";
     return os;
+}
+
+// Copy RMLVector elements to Python list
+template<typename T>
+auto to_list(const RMLVector<T>& v)
+{
+    py::list list;
+
+    for (unsigned i = 0; i < v.VectorDimension; ++i) {
+        list.append(v.VecData[i]);
+    }
+
+    return list;
+}
+
+// Copy RMLDoubleVectors to Python list
+auto to_list(RMLDoubleVector** vv, unsigned n)
+{
+    py::list list;
+
+    for (unsigned i = 0; i < n; ++i) {
+        list.append(*vv[i]);
+    }
+
+    return list;
+}
+
+// Create an RMLVector from a Python iterable
+template<typename T>
+std::shared_ptr<RMLVector<T>> make_vector(const py::object& iterable)
+{
+    auto n = static_cast<unsigned>(len(iterable));
+
+    if (n == 0)
+        throw std::invalid_argument("RMLVector does not support being empty");
+
+    auto v = std::make_shared<RMLVector<T>>(n);
+
+    for (unsigned i = 0; i < n; ++i) {
+        v->VecData[i] = py::extract<T>(iterable[i]);
+    }
+
+    return v;
 }
 
 // Expose a template instantiation of RMLVector
 template<typename T>
 void expose_RMLVector(const char* name)
 {
-    py::class_<RMLVector<T>>(name, py::init<unsigned>())
-        .def(py::init<const T&, const T&>())
-        .def(py::init<const T&, const T&, const T&>())
-        .def(py::init<const T&, const T&, const T&, const T&>())
-        .def(py::init<const T&, const T&, const T&, const T&, const T&>())
-        .def(py::init<const T&, const T&, const T&, const T&, const T&, const T&>())
-        .def(py::init<const T&, const T&, const T&, const T&, const T&, const T&, const T&>())
+    py::class_<RMLVector<T>>(name, py::no_init)
+        .def("__init__", py::make_constructor(make_vector<T>))
         .def("__len__", &RMLVector<T>::GetVecDim)
         .def("__getitem__",
              +[](const RMLVector<T>& self, unsigned idx) {

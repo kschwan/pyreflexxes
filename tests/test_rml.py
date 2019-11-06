@@ -15,13 +15,13 @@ class TestRML(unittest.TestCase):
         assert flags1 != flags2
 
     def test_vector(self):
-        v1 = RMLDoubleVector(1, 2, 3, 4, 5, 6, 7)
-        v2 = RMLDoubleVector(1, 2, 3, 4, 5, 6, 7)
+        v1 = RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
+        v2 = RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
         assert v1 == v2
-        assert v1 != RMLDoubleVector(0, 2, 3, 4, 5, 6, 7)
+        assert v1 != RMLDoubleVector([0, 2, 3, 4, 5, 6, 7])
 
-        v3 = RMLDoubleVector(123)
-        v4 = RMLDoubleVector(123)
+        v3 = RMLDoubleVector([0]*123)
+        v4 = RMLDoubleVector([0]*123)
         assert 123 == len(v3) == len(v4)
 
         for i in xrange(len(v3)):
@@ -45,18 +45,18 @@ class TestRML(unittest.TestCase):
         ip = RMLPositionInputParameters(NUMBER_OF_DOFS)
         op = RMLPositionOutputParameters(NUMBER_OF_DOFS)
 
-        ip.SelectionVector = RMLBoolVector(True, True, True)
+        ip.SelectionVector = RMLBoolVector([True, True, True])
 
-        ip.CurrentPositionVector = RMLDoubleVector(100, 0, 50)
-        ip.CurrentVelocityVector = RMLDoubleVector(100, -220, -50)
-        ip.CurrentAccelerationVector = RMLDoubleVector(-150, 250, -50)
+        ip.CurrentPositionVector = RMLDoubleVector([100, 0, 50])
+        ip.CurrentVelocityVector = RMLDoubleVector([100, -220, -50])
+        ip.CurrentAccelerationVector = RMLDoubleVector([-150, 250, -50])
 
-        ip.MaxVelocityVector = RMLDoubleVector(300, 100, 300)
-        ip.MaxAccelerationVector = RMLDoubleVector(300, 200, 100)
-        ip.MaxJerkVector = RMLDoubleVector(400, 300, 200)
+        ip.MaxVelocityVector = RMLDoubleVector([300, 100, 300])
+        ip.MaxAccelerationVector = RMLDoubleVector([300, 200, 100])
+        ip.MaxJerkVector = RMLDoubleVector([400, 300, 200])
 
-        ip.TargetPositionVector = RMLDoubleVector(-600, -200, -350)
-        ip.TargetVelocityVector = RMLDoubleVector(50, -50, -200)
+        ip.TargetPositionVector = RMLDoubleVector([-600, -200, -350])
+        ip.TargetVelocityVector = RMLDoubleVector([50, -50, -200])
 
         assert ip.CheckForValidity()
 
