@@ -16,10 +16,22 @@ from ._reflexxes_type2 import (
 )
 
 
+error_messages = {
+    ReflexxesAPI.RMLResultValue.RML_ERROR_INVALID_INPUT_VALUES: 'The applied input values are invalid',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_EXECUTION_TIME_CALCULATION: 'An error occurred during the calculation of the synchronization time (step 1)',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_SYNCHRONIZATION: 'An error occurred during the synchronization of the trajectory (step 2)',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_NUMBER_OF_DOFS: 'Mismatch in the number of degrees of freedom',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_NO_PHASE_SYNCHRONIZATION: 'It is not possible to calculate a phase-synchronized (i.e., homothetic) trajectory',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_NULL_POINTER: 'Flags or parameter object is NULL',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_EXECUTION_TIME_TOO_BIG: 'Minimum trajectory execution time is too large',
+    ReflexxesAPI.RMLResultValue.RML_ERROR_USER_TIME_OUT_OF_RANGE: 'The value of the desired sample time is out of range',
+}
+
+
 class RMLError(Exception):
-    def __init__(self, code):
-        super(RMLError, self).__init__()
-        self.code = code
+    def __init__(self, error_code):
+        super(RMLError, self).__init__(error_messages[error_code])
+        self.error_code = error_code
 
 
 class PositionTrajectoryGenerator(object):
