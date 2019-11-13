@@ -1,41 +1,52 @@
-from ._reflexxes_type2 import (
-    __version__,
-    ReflexxesAPI,
-    RMLBoolVector,
-    RMLDoubleVector,
-    RMLFlags,
-    RMLInputParameters,
-    RMLIntVector,
-    RMLOutputParameters,
-    RMLPositionFlags,
-    RMLPositionInputParameters,
-    RMLPositionOutputParameters,
-    RMLVelocityFlags,
-    RMLVelocityInputParameters,
-    RMLVelocityOutputParameters,
-)
-
-
-error_messages = {
-    ReflexxesAPI.RMLResultValue.RML_ERROR_INVALID_INPUT_VALUES: 'The applied input values are invalid',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_EXECUTION_TIME_CALCULATION: 'An error occurred during the calculation of the synchronization time (step 1)',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_SYNCHRONIZATION: 'An error occurred during the synchronization of the trajectory (step 2)',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_NUMBER_OF_DOFS: 'Mismatch in the number of degrees of freedom',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_NO_PHASE_SYNCHRONIZATION: 'It is not possible to calculate a phase-synchronized (i.e., homothetic) trajectory',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_NULL_POINTER: 'Flags or parameter object is NULL',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_EXECUTION_TIME_TOO_BIG: 'Minimum trajectory execution time is too large',
-    ReflexxesAPI.RMLResultValue.RML_ERROR_USER_TIME_OUT_OF_RANGE: 'The value of the desired sample time is out of range',
-}
+try:
+    # Prefer Type IV
+    from .reflexxes_type4 import (
+        error_string,
+        ReflexxesAPI,
+        RMLBoolVector,
+        RMLDoubleVector,
+        RMLFlags,
+        RMLInputParameters,
+        RMLIntVector,
+        RMLOutputParameters,
+        RMLOutputPolynomials,
+        RMLPolynomial,
+        RMLPositionFlags,
+        RMLPositionInputParameters,
+        RMLPositionOutputParameters,
+        RMLVelocityFlags,
+        RMLVelocityInputParameters,
+        RMLVelocityOutputParameters,
+    )
+    rml_type = 4
+except ImportError:
+    from .reflexxes_type2 import (
+        error_string,
+        ReflexxesAPI,
+        RMLBoolVector,
+        RMLDoubleVector,
+        RMLFlags,
+        RMLInputParameters,
+        RMLIntVector,
+        RMLOutputParameters,
+        RMLPositionFlags,
+        RMLPositionInputParameters,
+        RMLPositionOutputParameters,
+        RMLVelocityFlags,
+        RMLVelocityInputParameters,
+        RMLVelocityOutputParameters,
+    )
+    rml_type = 2
 
 
 class RMLError(Exception):
     def __init__(self, error_code):
-        super(RMLError, self).__init__(error_messages[error_code])
+        super(RMLError, self).__init__(error_string(error_code))
         self.error_code = error_code
 
 
 class PositionTrajectoryGenerator(object):
-    def __init__(self, n_dof, cycle_time, max_velocity, max_acceleration):
+    def __init__(self, n_dof, cycle_time, max_velocity, max_acceleration, max_jerk=None):
         assert len(max_velocity) == n_dof
         assert len(max_acceleration) == n_dof
 
@@ -49,6 +60,9 @@ class PositionTrajectoryGenerator(object):
         self.ip.SelectionVector.Set(True)
         self.ip.MaxVelocityVector = RMLDoubleVector(max_velocity)
         self.ip.MaxAccelerationVector = RMLDoubleVector(max_acceleration)
+
+        if max_jerk:  # needed for RML Type IV
+            self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
 
     def trajectory(self, target_position, target_velocity, min_sync_time=0.0):
         assert len(target_position) == self.n_dof
@@ -76,6 +90,15 @@ class PositionTrajectoryGenerator(object):
     def max_acceleration(self, max_acceleration):
         assert len(max_acceleration) == self.n_dof
         self.ip.MaxAccelerationVector = RMLDoubleVector(max_acceleration)
+
+    @property
+    def max_jerk(self):
+        return self.ip.MaxJerkVector.tolist()
+
+    @max_jerk.setter
+    def max_jerk(self, max_jerk):
+        assert len(max_jerk) == self.n_dof
+        self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
 
     @property
     def current_position(self):

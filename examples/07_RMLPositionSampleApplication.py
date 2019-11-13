@@ -1,7 +1,9 @@
 from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 import reflexxes
+
 
 NUMBER_OF_DOFS = 3
 CYCLE_TIME_IN_SECONDS = 0.001
@@ -9,8 +11,9 @@ CYCLE_TIME_IN_SECONDS = 0.001
 gen = reflexxes.PositionTrajectoryGenerator(
     NUMBER_OF_DOFS,
     CYCLE_TIME_IN_SECONDS,
-    [300, 100, 300],  # max. vel.
-    [300, 200, 100]  # max. acc.
+    [300, 100, 300], # max. vel.
+    [300, 200, 100], # max. acc.
+    [400, 300, 200]  # max. jerk
 )
 
 # set initial values
