@@ -10,4 +10,4 @@ assuming `setup.py` is located in the current working directory.
 This library depends on
 - python-dev
 - libboost-python-dev
-- libReflexxesTypeII (see https://github.com/kschwan/RMLTypeII for source to build and install)
+- libReflexxesTypeII or libReflexxesTypeIV
