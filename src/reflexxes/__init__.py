@@ -47,9 +47,6 @@ class RMLError(Exception):
 
 class PositionTrajectoryGenerator(object):
     def __init__(self, n_dof, cycle_time, max_velocity, max_acceleration, max_jerk=None):
-        assert len(max_velocity) == n_dof
-        assert len(max_acceleration) == n_dof
-
         self.n_dof = n_dof
         self.cycle_time = cycle_time
         self.rml = ReflexxesAPI(n_dof, cycle_time)
@@ -64,12 +61,15 @@ class PositionTrajectoryGenerator(object):
         if max_jerk:  # needed for RML Type IV
             self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
 
-    def trajectory(self, target_position, target_velocity, min_sync_time=0.0):
-        assert len(target_position) == self.n_dof
-        assert len(target_velocity) == self.n_dof
-        self.ip.TargetPositionVector = RMLDoubleVector(target_position)
-        self.ip.TargetVelocityVector = RMLDoubleVector(target_velocity)
+    def trajectory(self, target_position, target_velocity=None, min_sync_time=0):
         self.ip.MinimumSynchronizationTime = min_sync_time
+        self.ip.TargetPositionVector = RMLDoubleVector(target_position)
+
+        if target_velocity is None:
+            self.ip.TargetVelocityVector.Set(0)
+        else:
+            self.ip.TargetVelocityVector = RMLDoubleVector(target_velocity)
+
         assert self.ip.CheckForValidity()
         return PositionTrajectory(self.rml, self.ip, self.op, self.flags)
 
@@ -79,7 +79,6 @@ class PositionTrajectoryGenerator(object):
 
     @max_velocity.setter
     def max_velocity(self, max_velocity):
-        assert len(max_velocity) == self.n_dof
         self.ip.MaxVelocityVector = RMLDoubleVector(max_velocity)
 
     @property
@@ -88,7 +87,6 @@ class PositionTrajectoryGenerator(object):
 
     @max_acceleration.setter
     def max_acceleration(self, max_acceleration):
-        assert len(max_acceleration) == self.n_dof
         self.ip.MaxAccelerationVector = RMLDoubleVector(max_acceleration)
 
     @property
@@ -97,7 +95,6 @@ class PositionTrajectoryGenerator(object):
 
     @max_jerk.setter
     def max_jerk(self, max_jerk):
-        assert len(max_jerk) == self.n_dof
         self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
 
     @property
@@ -106,7 +103,6 @@ class PositionTrajectoryGenerator(object):
 
     @current_position.setter
     def current_position(self, position):
-        assert len(position) == self.n_dof
         self.ip.CurrentPositionVector = RMLDoubleVector(position)
 
     @property
@@ -115,7 +111,6 @@ class PositionTrajectoryGenerator(object):
 
     @current_velocity.setter
     def current_velocity(self, velocity):
-        assert len(velocity) == self.n_dof
         self.ip.CurrentVelocityVector = RMLDoubleVector(velocity)
 
     @property
@@ -124,7 +119,6 @@ class PositionTrajectoryGenerator(object):
 
     @current_acceleration.setter
     def current_acceleration(self, acceleration):
-        assert len(acceleration) == self.n_dof
         self.ip.CurrentAccelerationVector = RMLDoubleVector(acceleration)
 
 
