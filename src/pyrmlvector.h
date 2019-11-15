@@ -75,20 +75,27 @@ std::shared_ptr<RMLVector<T>> make_vector(const boost::python::object& iterable)
 template<typename T>
 void expose_RMLVector()
 {
+    using size_type = decltype(RMLVector<T>::VectorDimension);
+    using difference_type = typename std::make_signed<size_type>::type;
+
     boost::python::class_<RMLVector<T>>(RMLVectorName<RMLVector<T>>::value(), boost::python::no_init)
         .def("__init__", boost::python::make_constructor(make_vector<T>))
         .def("__len__", &RMLVector<T>::GetVecDim)
         .def("__getitem__",
-             +[](const RMLVector<T>& self, unsigned idx) {
-                 if (idx >= self.VectorDimension)
-                     throw std::out_of_range("RMLVector index out of range");
-                 return self.VecData[idx];
-             })
+            +[](const RMLVector<T>& self, difference_type i) {
+                if (i < 0)
+                    i += self.VectorDimension;
+                if (i < 0 || (size_type)i >= self.VectorDimension)
+                    throw std::out_of_range("RMLVector index out of range");
+                return self.VecData[(size_type)i];
+            })
         .def("__setitem__",
-             +[](RMLVector<T>& self, unsigned idx, const T& val) {
-                 if (idx >= self.VectorDimension)
-                     throw std::out_of_range("RMLVector index out of range");
-                 self.VecData[idx] = val;
+            +[](RMLVector<T>& self, difference_type i, const T& val) {
+                if (i < 0)
+                    i += self.VectorDimension;
+                if (i < 0 || (size_type)i >= self.VectorDimension)
+                    throw std::out_of_range("RMLVector index out of range");
+                self.VecData[(size_type)i] = val;
              })
         .def("__iter__", boost::python::range(+[](RMLVector<T>& self) { return self.VecData; }, +[](RMLVector<T>& self) { return self.VecData + self.VectorDimension; }))
         .def("__eq__", &RMLVector<T>::operator==)

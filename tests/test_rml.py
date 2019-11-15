@@ -19,6 +19,9 @@ class TestRML(unittest.TestCase):
         v2 = RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
         assert v1 == v2
         assert v1 != RMLDoubleVector([0, 2, 3, 4, 5, 6, 7])
+        v2[1] = 99
+        v2[-1] = 999
+        assert v2 == RMLDoubleVector([1, 99, 3, 4, 5, 6, 999])
 
         v3 = RMLDoubleVector([0]*123)
         v4 = RMLDoubleVector([0]*123)
