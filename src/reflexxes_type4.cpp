@@ -242,7 +242,7 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
 
     // RMLOutputParameters
     {
-        // RMLOutputParameters-objects have their members exposed through only
+        // RMLOutputParameters objects have their members exposed through only
         // getter functions. Values are returned here are copies (so modifying
         // them will not change the member of the RMLOutputParameters object).
         // See https://www.boost.org/doc/libs/1_65_0/libs/python/doc/html/faq/is_return_internal_reference_eff.html

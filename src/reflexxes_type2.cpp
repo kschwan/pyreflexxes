@@ -59,6 +59,7 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
 
     py::def("error_string", error_string);
 
+    // RMLVector(s)
     expose_RMLVector<bool>();
     expose_RMLVector<int>();
     expose_RMLVector<double>();
@@ -72,7 +73,6 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
             .def("RMLVelocity", &ReflexxesAPI::RMLVelocity)
             .def("RMLVelocityAtAGivenSampleTime", &ReflexxesAPI::RMLVelocityAtAGivenSampleTime)
         ;
-
         py::enum_<ReflexxesAPI::RMLResultValue>("RMLResultValue")
             .value("RML_WORKING", ReflexxesAPI::RML_WORKING)
             .value("RML_FINAL_STATE_REACHED", ReflexxesAPI::RML_FINAL_STATE_REACHED)
@@ -97,7 +97,6 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
             .def_readwrite("SynchronizationBehavior", &RMLFlags::SynchronizationBehavior)
             .def_readwrite("EnableTheCalculationOfTheExtremumMotionStates", &RMLFlags::EnableTheCalculationOfTheExtremumMotionStates)
         ;
-
         py::enum_<RMLFlags::SyncBehaviorEnum>("SyncBehavior")
             .value("PHASE_SYNCHRONIZATION_IF_POSSIBLE", RMLFlags::PHASE_SYNCHRONIZATION_IF_POSSIBLE)
             .value("ONLY_TIME_SYNCHRONIZATION", RMLFlags::ONLY_TIME_SYNCHRONIZATION)
@@ -115,7 +114,6 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
             .def_readwrite("BehaviorAfterFinalStateOfMotionIsReached", &RMLPositionFlags::BehaviorAfterFinalStateOfMotionIsReached)
             .def_readwrite("KeepCurrentVelocityInCaseOfFallbackStrategy", &RMLPositionFlags::KeepCurrentVelocityInCaseOfFallbackStrategy)
         ;
-
         py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>("FinalMotionBehavior")
             .value("KEEP_TARGET_VELOCITY", RMLPositionFlags::KEEP_TARGET_VELOCITY)
             .value("RECOMPUTE_TRAJECTORY", RMLPositionFlags::RECOMPUTE_TRAJECTORY)
