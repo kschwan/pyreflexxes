@@ -57,14 +57,15 @@ inline auto make_list(const RMLVector<T>& v)
 template<typename T>
 std::shared_ptr<RMLVector<T>> make_vector(const boost::python::object& iterable)
 {
-    auto n = static_cast<unsigned>(len(iterable));
+    using size_type = decltype(RMLVector<T>::VectorDimension);
+    auto n = static_cast<size_type>(boost::python::len(iterable));
 
     if (n == 0)
         throw std::invalid_argument("RMLVector does not support being empty");
 
     auto v = std::make_shared<RMLVector<T>>(n);
 
-    for (unsigned i = 0; i < n; ++i) {
+    for (size_type i = 0; i < n; ++i) {
         v->VecData[i] = boost::python::extract<T>(iterable[i]);
     }
 
