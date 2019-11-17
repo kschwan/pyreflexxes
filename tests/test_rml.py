@@ -1,5 +1,5 @@
+import reflexxes
 import unittest
-from reflexxes import *
 
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
@@ -8,23 +8,23 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
 
 class TestRML(unittest.TestCase):
     def test_flags(self):
-        flags1 = RMLPositionFlags()
-        flags2 = RMLPositionFlags()
+        flags1 = reflexxes.RMLPositionFlags()
+        flags2 = reflexxes.RMLPositionFlags()
         assert flags1 == flags2
-        flags1.SynchronizationBehavior = RMLFlags.SyncBehavior.NO_SYNCHRONIZATION
+        flags1.SynchronizationBehavior = reflexxes.RMLFlags.SyncBehavior.NO_SYNCHRONIZATION
         assert flags1 != flags2
 
     def test_vector(self):
-        v1 = RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
-        v2 = RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
+        v1 = reflexxes.RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
+        v2 = reflexxes.RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
         assert v1 == v2
-        assert v1 != RMLDoubleVector([0, 2, 3, 4, 5, 6, 7])
+        assert v1 != reflexxes.RMLDoubleVector([0, 2, 3, 4, 5, 6, 7])
         v2[1] = 99
         v2[-1] = 999
-        assert v2 == RMLDoubleVector([1, 99, 3, 4, 5, 6, 999])
+        assert v2 == reflexxes.RMLDoubleVector([1, 99, 3, 4, 5, 6, 999])
 
-        v3 = RMLDoubleVector([0]*123)
-        v4 = RMLDoubleVector([0]*123)
+        v3 = reflexxes.RMLDoubleVector([0]*123)
+        v4 = reflexxes.RMLDoubleVector([0]*123)
         assert 123 == len(v3) == len(v4)
 
         for i in xrange(len(v3)):
@@ -43,23 +43,23 @@ class TestRML(unittest.TestCase):
         NUMBER_OF_DOFS = 3
         CYCLE_TIME_IN_SECONDS = 0.001
 
-        flags = RMLPositionFlags()
-        rml = ReflexxesAPI(NUMBER_OF_DOFS, CYCLE_TIME_IN_SECONDS)
-        ip = RMLPositionInputParameters(NUMBER_OF_DOFS)
-        op = RMLPositionOutputParameters(NUMBER_OF_DOFS)
+        flags = reflexxes.RMLPositionFlags()
+        rml = reflexxes.ReflexxesAPI(NUMBER_OF_DOFS, CYCLE_TIME_IN_SECONDS)
+        ip = reflexxes.RMLPositionInputParameters(NUMBER_OF_DOFS)
+        op = reflexxes.RMLPositionOutputParameters(NUMBER_OF_DOFS)
 
-        ip.SelectionVector = RMLBoolVector([True, True, True])
+        ip.SelectionVector = reflexxes.RMLBoolVector([True, True, True])
 
-        ip.CurrentPositionVector = RMLDoubleVector([100, 0, 50])
-        ip.CurrentVelocityVector = RMLDoubleVector([100, -220, -50])
-        ip.CurrentAccelerationVector = RMLDoubleVector([-150, 250, -50])
+        ip.CurrentPositionVector = reflexxes.RMLDoubleVector([100, 0, 50])
+        ip.CurrentVelocityVector = reflexxes.RMLDoubleVector([100, -220, -50])
+        ip.CurrentAccelerationVector = reflexxes.RMLDoubleVector([-150, 250, -50])
 
-        ip.MaxVelocityVector = RMLDoubleVector([300, 100, 300])
-        ip.MaxAccelerationVector = RMLDoubleVector([300, 200, 100])
-        ip.MaxJerkVector = RMLDoubleVector([400, 300, 200])
+        ip.MaxVelocityVector = reflexxes.RMLDoubleVector([300, 100, 300])
+        ip.MaxAccelerationVector = reflexxes.RMLDoubleVector([300, 200, 100])
+        ip.MaxJerkVector = reflexxes.RMLDoubleVector([400, 300, 200])
 
-        ip.TargetPositionVector = RMLDoubleVector([-600, -200, -350])
-        ip.TargetVelocityVector = RMLDoubleVector([50, -50, -200])
+        ip.TargetPositionVector = reflexxes.RMLDoubleVector([-600, -200, -350])
+        ip.TargetVelocityVector = reflexxes.RMLDoubleVector([50, -50, -200])
 
         assert ip.CheckForValidity()
 
