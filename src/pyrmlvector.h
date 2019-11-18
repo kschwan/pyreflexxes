@@ -1,6 +1,8 @@
 #ifndef PYRMLVECTOR_H
 #define PYRMLVECTOR_H
 
+#include "makelist.h"
+
 #include <RMLVector.h>
 
 #include <boost/python.hpp>
@@ -50,8 +52,8 @@ void expose_RMLVector()
     using difference_type = typename std::make_signed<size_type>::type;
 
     py::class_<RMLVector<T>>(RMLVectorName<RMLVector<T>>::value(), py::no_init)
-        .def("__init__", py::make_constructor(+[](py::object iterable) {
-            auto n = static_cast<size_type>(py::len(iterable));
+        .def("__init__", py::make_constructor(+[](py::object sequence) {
+            auto n = static_cast<size_type>(py::len(sequence));
 
             if (n == 0)
                 throw std::invalid_argument("RMLVector does not support being empty");
@@ -59,7 +61,7 @@ void expose_RMLVector()
             auto v = std::make_shared<RMLVector<T>>(n);
 
             for (size_type i = 0; i < n; ++i)
-                v->VecData[i] = py::extract<T>(iterable[i]);
+                v->VecData[i] = py::extract<T>(sequence[i]);
 
             return v;
         }))
@@ -80,11 +82,16 @@ void expose_RMLVector()
                     throw std::out_of_range("RMLVector index out of range");
                 self.VecData[(size_type)i] = val;
              })
-        .def("__iter__", py::range(+[](const RMLVector<T>& self) { return self.VecData; }, +[](const RMLVector<T>& self) { return std::next(self.VecData, self.VectorDimension); }))
+        .def("__iter__", py::range(
+            +[](const RMLVector<T>& self) { return self.VecData; },
+            +[](const RMLVector<T>& self) { return std::next(self.VecData, self.VectorDimension); }
+        ))
         .def("__eq__", &RMLVector<T>::operator==)
         .def("__ne__", &RMLVector<T>::operator!=)
         .def("Set", &RMLVector<T>::Set)
-        .def("tolist", +[](const RMLVector<T>& self) { return make_list(self.VecData, std::next(self.VecData, self.VectorDimension)); })
+        .def("tolist", +[](const RMLVector<T>& self) {
+            return make_list(self.VecData, std::next(self.VecData, self.VectorDimension));
+        })
         .def(repr(py::self))
     ;
 }
