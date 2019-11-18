@@ -1,4 +1,4 @@
-# Python interface for the Type II Reflexxes Motion Library
+# Python interface for the Reflexxes Motion Libraries
 
 The `setup.py` script will invoke CMake to build the module. The module can thus
 be built and installed with e.g.
