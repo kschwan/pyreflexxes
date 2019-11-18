@@ -27,7 +27,7 @@ class TestRML(unittest.TestCase):
         v4 = reflexxes.RMLDoubleVector([0]*123)
         assert 123 == len(v3) == len(v4)
 
-        for i in xrange(len(v3)):
+        for i in range(len(v3)):
             v3[i] = i
             v4[i] = i
 

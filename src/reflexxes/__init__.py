@@ -132,7 +132,7 @@ class PositionTrajectory(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         ret = self.rml.RMLPosition(self.ip, self.op, self.flags)
 
         if ret < 0:
@@ -148,3 +148,6 @@ class PositionTrajectory(object):
 
         return self.op.NewPositionVector, self.op.NewVelocityVector, self.op.NewAccelerationVector
 
+    def next(self):
+        # For Python 2.7 compatibility
+        return self.__next__()

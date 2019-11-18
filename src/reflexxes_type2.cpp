@@ -20,9 +20,9 @@
 
 #include <ReflexxesAPI.h>
 
-#include <boost/noncopyable.hpp>
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 
+namespace {
 std::string error_string(int val)
 {
     switch (val) {
@@ -52,180 +52,179 @@ std::string error_string(int val)
         return "(Not enumerated): Unknown error or return value";
     }
 }
+}
 
-BOOST_PYTHON_MODULE(reflexxes_type2)
+PYBIND11_MODULE(reflexxes_type2, m)
 {
-    namespace py = boost::python;
+    namespace py = pybind11;
 
-    py::def("error_string", error_string);
+    m.def("error_string", error_string);
 
     // RMLVector(s)
-    expose_RMLVector<bool>();
-    expose_RMLVector<int>();
-    expose_RMLVector<double>();
+    expose_RMLVector<bool>(m, "RMLBoolVector");
+    expose_RMLVector<int>(m, "RMLIntVector");
+    expose_RMLVector<double>(m, "RMLDoubleVector");
 
     // ReflexxesAPI
-    {
-        py::scope scope =
-        py::class_<ReflexxesAPI>("ReflexxesAPI", py::init<unsigned, double>())
-            .def("RMLPosition", &ReflexxesAPI::RMLPosition)
-            .def("RMLPositionAtAGivenSampleTime", &ReflexxesAPI::RMLPositionAtAGivenSampleTime)
-            .def("RMLVelocity", &ReflexxesAPI::RMLVelocity)
-            .def("RMLVelocityAtAGivenSampleTime", &ReflexxesAPI::RMLVelocityAtAGivenSampleTime)
-        ;
-        py::enum_<ReflexxesAPI::RMLResultValue>("RMLResultValue")
-            .value("RML_WORKING", ReflexxesAPI::RML_WORKING)
-            .value("RML_FINAL_STATE_REACHED", ReflexxesAPI::RML_FINAL_STATE_REACHED)
-            .value("RML_ERROR", ReflexxesAPI::RML_ERROR)
-            .value("RML_ERROR_INVALID_INPUT_VALUES", ReflexxesAPI::RML_ERROR_INVALID_INPUT_VALUES)
-            .value("RML_ERROR_EXECUTION_TIME_CALCULATION", ReflexxesAPI::RML_ERROR_EXECUTION_TIME_CALCULATION)
-            .value("RML_ERROR_SYNCHRONIZATION", ReflexxesAPI::RML_ERROR_SYNCHRONIZATION)
-            .value("RML_ERROR_NUMBER_OF_DOFS", ReflexxesAPI::RML_ERROR_NUMBER_OF_DOFS)
-            .value("RML_ERROR_NO_PHASE_SYNCHRONIZATION", ReflexxesAPI::RML_ERROR_NO_PHASE_SYNCHRONIZATION)
-            .value("RML_ERROR_NULL_POINTER", ReflexxesAPI::RML_ERROR_NULL_POINTER)
-            .value("RML_ERROR_EXECUTION_TIME_TOO_BIG", ReflexxesAPI::RML_ERROR_EXECUTION_TIME_TOO_BIG)
-            .value("RML_ERROR_USER_TIME_OUT_OF_RANGE", ReflexxesAPI::RML_ERROR_USER_TIME_OUT_OF_RANGE)
-            .export_values()
-        ;
-    }
+    py::class_<ReflexxesAPI> reflexxes_api(m, "ReflexxesAPI");
+    reflexxes_api
+        .def(py::init<unsigned, double>())
+        .def("RMLPosition", &ReflexxesAPI::RMLPosition)
+        .def("RMLPositionAtAGivenSampleTime", &ReflexxesAPI::RMLPositionAtAGivenSampleTime)
+        .def("RMLVelocity", &ReflexxesAPI::RMLVelocity)
+        .def("RMLVelocityAtAGivenSampleTime", &ReflexxesAPI::RMLVelocityAtAGivenSampleTime)
+    ;
+    py::enum_<ReflexxesAPI::RMLResultValue>(reflexxes_api, "RMLResultValue")
+        .value("RML_WORKING", ReflexxesAPI::RML_WORKING)
+        .value("RML_FINAL_STATE_REACHED", ReflexxesAPI::RML_FINAL_STATE_REACHED)
+        .value("RML_ERROR", ReflexxesAPI::RML_ERROR)
+        .value("RML_ERROR_INVALID_INPUT_VALUES", ReflexxesAPI::RML_ERROR_INVALID_INPUT_VALUES)
+        .value("RML_ERROR_EXECUTION_TIME_CALCULATION", ReflexxesAPI::RML_ERROR_EXECUTION_TIME_CALCULATION)
+        .value("RML_ERROR_SYNCHRONIZATION", ReflexxesAPI::RML_ERROR_SYNCHRONIZATION)
+        .value("RML_ERROR_NUMBER_OF_DOFS", ReflexxesAPI::RML_ERROR_NUMBER_OF_DOFS)
+        .value("RML_ERROR_NO_PHASE_SYNCHRONIZATION", ReflexxesAPI::RML_ERROR_NO_PHASE_SYNCHRONIZATION)
+        .value("RML_ERROR_NULL_POINTER", ReflexxesAPI::RML_ERROR_NULL_POINTER)
+        .value("RML_ERROR_EXECUTION_TIME_TOO_BIG", ReflexxesAPI::RML_ERROR_EXECUTION_TIME_TOO_BIG)
+        .value("RML_ERROR_USER_TIME_OUT_OF_RANGE", ReflexxesAPI::RML_ERROR_USER_TIME_OUT_OF_RANGE)
+        .export_values()
+    ;
 
     // RMLFlags
-    {
-        py::scope scope =
-        py::class_<RMLFlags>("RMLFlags", py::no_init)
-            .def("__eq__", &RMLFlags::operator==)
-            .def("__ne__", &RMLFlags::operator!=)
-            .def_readwrite("SynchronizationBehavior", &RMLFlags::SynchronizationBehavior)
-            .def_readwrite("EnableTheCalculationOfTheExtremumMotionStates", &RMLFlags::EnableTheCalculationOfTheExtremumMotionStates)
-        ;
-        py::enum_<RMLFlags::SyncBehaviorEnum>("SyncBehaviorEnum")
-            .value("PHASE_SYNCHRONIZATION_IF_POSSIBLE", RMLFlags::PHASE_SYNCHRONIZATION_IF_POSSIBLE)
-            .value("ONLY_TIME_SYNCHRONIZATION", RMLFlags::ONLY_TIME_SYNCHRONIZATION)
-            .value("ONLY_PHASE_SYNCHRONIZATION", RMLFlags::ONLY_PHASE_SYNCHRONIZATION)
-            .value("NO_SYNCHRONIZATION", RMLFlags::NO_SYNCHRONIZATION)
-            .export_values()
-        ;
-    }
+    py::class_<RMLFlags> rml_flags(m, "RMLFlags");
+    rml_flags
+        .def("__eq__", &RMLFlags::operator==)
+        .def("__ne__", &RMLFlags::operator!=)
+        .def_readwrite("SynchronizationBehavior", &RMLFlags::SynchronizationBehavior)
+        .def_readwrite("EnableTheCalculationOfTheExtremumMotionStates", &RMLFlags::EnableTheCalculationOfTheExtremumMotionStates)
+    ;
+    py::enum_<RMLFlags::SyncBehaviorEnum>(rml_flags, "SyncBehaviorEnum")
+        .value("PHASE_SYNCHRONIZATION_IF_POSSIBLE", RMLFlags::PHASE_SYNCHRONIZATION_IF_POSSIBLE)
+        .value("ONLY_TIME_SYNCHRONIZATION", RMLFlags::ONLY_TIME_SYNCHRONIZATION)
+        .value("ONLY_PHASE_SYNCHRONIZATION", RMLFlags::ONLY_PHASE_SYNCHRONIZATION)
+        .value("NO_SYNCHRONIZATION", RMLFlags::NO_SYNCHRONIZATION)
+        .export_values()
+    ;
 
     // RMLPositionFlags
-    {
-        py::scope scope =
-        py::class_<RMLPositionFlags, py::bases<RMLFlags>>("RMLPositionFlags")
-            .def("__eq__", &RMLPositionFlags::operator==)
-            .def("__ne__", &RMLPositionFlags::operator!=)
-            .def_readwrite("BehaviorAfterFinalStateOfMotionIsReached", &RMLPositionFlags::BehaviorAfterFinalStateOfMotionIsReached)
-            .def_readwrite("KeepCurrentVelocityInCaseOfFallbackStrategy", &RMLPositionFlags::KeepCurrentVelocityInCaseOfFallbackStrategy)
-        ;
-        py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>("FinalMotionBehaviorEnum")
-            .value("KEEP_TARGET_VELOCITY", RMLPositionFlags::KEEP_TARGET_VELOCITY)
-            .value("RECOMPUTE_TRAJECTORY", RMLPositionFlags::RECOMPUTE_TRAJECTORY)
-            .export_values()
-        ;
-    }
+    py::class_<RMLPositionFlags, RMLFlags> rml_position_flags(m, "RMLPositionFlags");
+    rml_position_flags
+        .def(py::init<>())
+        .def("__eq__", &RMLPositionFlags::operator==)
+        .def("__ne__", &RMLPositionFlags::operator!=)
+        .def_readwrite("BehaviorAfterFinalStateOfMotionIsReached", &RMLPositionFlags::BehaviorAfterFinalStateOfMotionIsReached)
+        .def_readwrite("KeepCurrentVelocityInCaseOfFallbackStrategy", &RMLPositionFlags::KeepCurrentVelocityInCaseOfFallbackStrategy)
+    ;
+    py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>(rml_position_flags, "FinalMotionBehaviorEnum")
+        .value("KEEP_TARGET_VELOCITY", RMLPositionFlags::KEEP_TARGET_VELOCITY)
+        .value("RECOMPUTE_TRAJECTORY", RMLPositionFlags::RECOMPUTE_TRAJECTORY)
+        .export_values()
+    ;
 
     // RMLVelocityFlags
-    py::class_<RMLVelocityFlags, py::bases<RMLFlags>>("RMLVelocityFlags")
+    py::class_<RMLVelocityFlags, RMLFlags>(m, "RMLVelocityFlags")
+        .def(py::init<>())
         .def("__eq__", &RMLVelocityFlags::operator==)
         .def("__ne__", &RMLVelocityFlags::operator!=)
     ;
 
     // RMLInputParameters
-    // RMLInputParameters objects have their members exposed through getter
-    // functions that uses the 'return_internal_reference' call policy to allow
-    // modifying the members. Properties also have setter functions.
-    py::class_<RMLInputParameters>("RMLInputParameters", py::no_init) // Base class with protected ctor
+    py::class_<RMLInputParameters>(m, "RMLInputParameters")
         .def_readonly("NumberOfDOFs", &RMLInputParameters::NumberOfDOFs)
         .def_readwrite("MinimumSynchronizationTime", &RMLInputParameters::MinimumSynchronizationTime)
-        .add_property("SelectionVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.SelectionVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLBoolVector& v) { *self.SelectionVector = v; }))
-        .add_property("CurrentPositionVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.CurrentPositionVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentPositionVector = v; }))
-        .add_property("CurrentVelocityVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.CurrentVelocityVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentVelocityVector = v; }))
-        .add_property("CurrentAccelerationVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.CurrentAccelerationVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentAccelerationVector = v; }))
-        .add_property("MaxAccelerationVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.MaxAccelerationVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxAccelerationVector = v; }))
-        .add_property("MaxJerkVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.MaxJerkVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxJerkVector = v; }))
-        .add_property("TargetVelocityVector",
-            py::make_function(+[](const RMLInputParameters& self) { return self.TargetVelocityVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.TargetVelocityVector = v; }))
+        .def_property("SelectionVector",
+            [](const RMLInputParameters& self) { return self.SelectionVector; },
+            [](RMLInputParameters& self, const RMLBoolVector& v) { *self.SelectionVector = v; })
+        .def_property("CurrentPositionVector",
+            [](const RMLInputParameters& self) { return self.CurrentPositionVector; },
+            [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentPositionVector = v; })
+        .def_property("CurrentVelocityVector",
+            [](const RMLInputParameters& self) { return self.CurrentVelocityVector; },
+            [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentVelocityVector = v; })
+        .def_property("CurrentAccelerationVector",
+            [](const RMLInputParameters& self) { return self.CurrentAccelerationVector; },
+            [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentAccelerationVector = v; })
+        .def_property("MaxAccelerationVector",
+            [](const RMLInputParameters& self) { return self.MaxAccelerationVector; },
+            [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxAccelerationVector = v; })
+        .def_property("MaxJerkVector",
+            [](const RMLInputParameters& self) { return self.MaxJerkVector; },
+            [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxJerkVector = v; })
+        .def_property("TargetVelocityVector",
+            [](const RMLInputParameters& self) { return self.TargetVelocityVector; },
+            [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.TargetVelocityVector = v; })
     ;
 
     // RMLPositionInputParameters
-    py::class_<RMLPositionInputParameters, py::bases<RMLInputParameters>>("RMLPositionInputParameters", py::init<unsigned>())
+    py::class_<RMLPositionInputParameters, RMLInputParameters>(m, "RMLPositionInputParameters")
+        .def(py::init<unsigned>())
         .def("CheckForValidity", &RMLPositionInputParameters::CheckForValidity)
-        .add_property("MaxVelocityVector",
-            py::make_function(+[](const RMLPositionInputParameters& self) { return self.MaxVelocityVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.MaxVelocityVector = v; }))
-        .add_property("TargetPositionVector",
-            py::make_function(+[](const RMLPositionInputParameters& self) { return self.TargetPositionVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.TargetPositionVector = v; }))
-        .add_property("AlternativeTargetVelocityVector",
-            py::make_function(+[](const RMLPositionInputParameters& self) { return self.AlternativeTargetVelocityVector; }, py::return_internal_reference<>()),
-            py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.AlternativeTargetVelocityVector = v; }))
+        .def_property("MaxVelocityVector",
+            [](const RMLPositionInputParameters& self) { return self.MaxVelocityVector; },
+            [](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.MaxVelocityVector = v; })
+        .def_property("TargetPositionVector",
+            [](const RMLPositionInputParameters& self) { return self.TargetPositionVector; },
+            [](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.TargetPositionVector = v; })
+        .def_property("AlternativeTargetVelocityVector",
+            [](const RMLPositionInputParameters& self) { return self.AlternativeTargetVelocityVector; },
+            [](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.AlternativeTargetVelocityVector = v; })
     ;
 
     // RMLVelocityInputParameters
-    py::class_<RMLVelocityInputParameters, py::bases<RMLInputParameters>>("RMLVelocityInputParameters", py::init<unsigned>())
+    py::class_<RMLVelocityInputParameters, RMLInputParameters>(m, "RMLVelocityInputParameters")
+        .def(py::init<unsigned>())
         .def("CheckForValidity", &RMLVelocityInputParameters::CheckForValidity)
     ;
 
     // RMLOutputParameters
-    {
-        // RMLOutputParameters objects have their members exposed through only
-        // getter functions. Values are returned here are copies (so modifying
-        // them will not change the member of the RMLOutputParameters object).
-        // See https://www.boost.org/doc/libs/1_65_0/libs/python/doc/html/faq/is_return_internal_reference_eff.html
-        py::scope scope =
-        py::class_<RMLOutputParameters, boost::noncopyable>("RMLOutputParameters", py::no_init) // Base class with protected ctor (including copy ctor)
-            .def_readonly("ANewCalculationWasPerformed", &RMLOutputParameters::ANewCalculationWasPerformed)
-            .def_readonly("TrajectoryIsPhaseSynchronized", &RMLOutputParameters::TrajectoryIsPhaseSynchronized)
-            .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs)
-            .def_readonly("DOFWithTheGreatestExecutionTime", &RMLOutputParameters::DOFWithTheGreatestExecutionTime)
-            .def_readonly("SynchronizationTime", &RMLOutputParameters::SynchronizationTime)
-            .add_property("NewPositionVector", +[](const RMLOutputParameters& self) { return *self.NewPositionVector; })
-            .add_property("NewVelocityVector", +[](const RMLOutputParameters& self) { return *self.NewVelocityVector; })
-            .add_property("NewAccelerationVector", +[](const RMLOutputParameters& self) { return *self.NewAccelerationVector; })
-            .add_property("MinExtremaTimesVector", +[](const RMLOutputParameters& self) { return *self.MinExtremaTimesVector; })
-            .add_property("MaxExtremaTimesVector", +[](const RMLOutputParameters& self) { return *self.MaxExtremaTimesVector; })
-            .add_property("MinPosExtremaPositionVectorOnly", +[](const RMLOutputParameters& self) { return *self.MinPosExtremaPositionVectorOnly; })
-            .add_property("MaxPosExtremaPositionVectorOnly", +[](const RMLOutputParameters& self) { return *self.MaxPosExtremaPositionVectorOnly; })
-            .add_property("ExecutionTimes", +[](const RMLOutputParameters& self) { return *self.ExecutionTimes; })
-            // The returned lists contain copies of RMLVectors pointed to
-            .add_property("MinPosExtremaPositionVectorArray",
-                +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
-            .add_property("MinPosExtremaVelocityVectorArray",
-                +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaVelocityVectorArray, std::next(self.MinPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
-            .add_property("MinPosExtremaAccelerationVectorArray",
-                +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaAccelerationVectorArray, std::next(self.MinPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
-            .add_property("MaxPosExtremaPositionVectorArray",
-                +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaPositionVectorArray, std::next(self.MaxPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
-            .add_property("MaxPosExtremaVelocityVectorArray",
-                +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaVelocityVectorArray, std::next(self.MaxPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
-            .add_property("MaxPosExtremaAccelerationVectorArray",
-                +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaAccelerationVectorArray, std::next(self.MaxPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
-        ;
+    py::class_<RMLOutputParameters> rml_output_parameters(m, "RMLOutputParameters");
+    rml_output_parameters
+        .def_readonly("ANewCalculationWasPerformed", &RMLOutputParameters::ANewCalculationWasPerformed, py::return_value_policy::copy)
+        .def_readonly("TrajectoryIsPhaseSynchronized", &RMLOutputParameters::TrajectoryIsPhaseSynchronized, py::return_value_policy::copy)
+        .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs, py::return_value_policy::copy)
+        .def_readonly("DOFWithTheGreatestExecutionTime", &RMLOutputParameters::DOFWithTheGreatestExecutionTime, py::return_value_policy::copy)
+        .def_readonly("SynchronizationTime", &RMLOutputParameters::SynchronizationTime, py::return_value_policy::copy)
+        .def_readonly("NewPositionVector", &RMLOutputParameters::NewPositionVector, py::return_value_policy::copy)
+        .def_readonly("NewVelocityVector", &RMLOutputParameters::NewVelocityVector, py::return_value_policy::copy)
+        .def_readonly("NewAccelerationVector", &RMLOutputParameters::NewAccelerationVector, py::return_value_policy::copy)
+        .def_readonly("MinExtremaTimesVector", &RMLOutputParameters::MinExtremaTimesVector, py::return_value_policy::copy)
+        .def_readonly("MaxExtremaTimesVector", &RMLOutputParameters::MaxExtremaTimesVector, py::return_value_policy::copy)
+        .def_readonly("MinPosExtremaPositionVectorOnly", &RMLOutputParameters::MinPosExtremaPositionVectorOnly, py::return_value_policy::copy)
+        .def_readonly("MaxPosExtremaPositionVectorOnly", &RMLOutputParameters::MaxPosExtremaPositionVectorOnly, py::return_value_policy::copy)
+        .def_readonly("ExecutionTimes", &RMLOutputParameters::ExecutionTimes, py::return_value_policy::copy)
+        .def_property_readonly("MinPosExtremaPositionVectorArray",
+            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); },
+            py::return_value_policy::copy)
+        .def_property_readonly("MinPosExtremaVelocityVectorArray",
+            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaVelocityVectorArray, std::next(self.MinPosExtremaVelocityVectorArray, self.NumberOfDOFs)); },
+            py::return_value_policy::copy)
+        .def_property_readonly("MinPosExtremaAccelerationVectorArray",
+            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaAccelerationVectorArray, std::next(self.MinPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); },
+            py::return_value_policy::copy)
+        .def_property_readonly("MaxPosExtremaPositionVectorArray",
+            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaPositionVectorArray, std::next(self.MaxPosExtremaPositionVectorArray, self.NumberOfDOFs)); },
+            py::return_value_policy::copy)
+        .def_property_readonly("MaxPosExtremaVelocityVectorArray",
+            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaVelocityVectorArray, std::next(self.MaxPosExtremaVelocityVectorArray, self.NumberOfDOFs)); },
+            py::return_value_policy::copy)
+        .def_property_readonly("MaxPosExtremaAccelerationVectorArray",
+            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaAccelerationVectorArray, std::next(self.MaxPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); },
+            py::return_value_policy::copy)
+    ;
 
-        py::enum_<RMLOutputParameters::ReturnValue>("ReturnValue")
-            .value("RETURN_SUCCESS", RMLOutputParameters::RETURN_SUCCESS)
-            .value("RETURN_ERROR", RMLOutputParameters::RETURN_ERROR)
-            .export_values()
-        ;
-    }
+    py::enum_<RMLOutputParameters::ReturnValue>(rml_output_parameters, "ReturnValue")
+        .value("RETURN_SUCCESS", RMLOutputParameters::RETURN_SUCCESS)
+        .value("RETURN_ERROR", RMLOutputParameters::RETURN_ERROR)
+        .export_values()
+    ;
 
     // RMLPositionOutputParameters
-    py::class_<RMLPositionOutputParameters, py::bases<RMLOutputParameters>>("RMLPositionOutputParameters", py::init<unsigned>());
+    py::class_<RMLPositionOutputParameters, RMLOutputParameters>(m, "RMLPositionOutputParameters")
+        .def(py::init<unsigned>())
+    ;
 
     // RMLVelocityOutputParameters
-    py::class_<RMLVelocityOutputParameters, py::bases<RMLOutputParameters>>("RMLVelocityOutputParameters", py::init<unsigned>())
-        .add_property("PositionValuesAtTargetVelocity", +[](const RMLVelocityOutputParameters& self) { return *self.PositionValuesAtTargetVelocity; })
+    py::class_<RMLVelocityOutputParameters, RMLOutputParameters>(m, "RMLVelocityOutputParameters")
+        .def(py::init<unsigned>())
+        .def_readonly("PositionValuesAtTargetVelocity", &RMLVelocityOutputParameters::PositionValuesAtTargetVelocity, py::return_value_policy::copy)
     ;
 }

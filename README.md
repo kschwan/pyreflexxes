@@ -5,9 +5,7 @@ be built and installed with e.g.
 
     pip install --user .
 
-assuming `setup.py` is located in the current working directory.
-
 This library depends on
 - python-dev
-- libboost-python-dev
+- pybind11
 - libReflexxesTypeII or libReflexxesTypeIV
