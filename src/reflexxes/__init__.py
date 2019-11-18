@@ -138,7 +138,7 @@ class PositionTrajectory(object):
         if ret < 0:
             raise RMLError(ret)
 
-        if ret == ReflexxesAPI.RMLResultValue.RML_FINAL_STATE_REACHED:
+        if ret == ReflexxesAPI.RML_FINAL_STATE_REACHED:
             raise StopIteration
 
         # Feedback

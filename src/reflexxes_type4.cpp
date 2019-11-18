@@ -96,6 +96,7 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
             .value("RML_ERROR_USER_TIME_OUT_OF_RANGE", ReflexxesAPI::RML_ERROR_USER_TIME_OUT_OF_RANGE)
             .value("RML_ERROR_POSITIONAL_LIMITS", ReflexxesAPI::RML_ERROR_POSITIONAL_LIMITS)
             .value("RML_ERROR_OVERRIDE_OUT_OF_RANGE", ReflexxesAPI::RML_ERROR_OVERRIDE_OUT_OF_RANGE)
+            .export_values()
         ;
     }
 
@@ -109,16 +110,18 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
             .def_readwrite("PositionalLimitsBehavior", &RMLFlags::PositionalLimitsBehavior)
             .def_readwrite("EnableTheCalculationOfTheExtremumMotionStates", &RMLFlags::EnableTheCalculationOfTheExtremumMotionStates)
         ;
-        py::enum_<RMLFlags::SyncBehaviorEnum>("SyncBehavior")
+        py::enum_<RMLFlags::SyncBehaviorEnum>("SyncBehaviorEnum")
             .value("PHASE_SYNCHRONIZATION_IF_POSSIBLE", RMLFlags::PHASE_SYNCHRONIZATION_IF_POSSIBLE)
             .value("ONLY_TIME_SYNCHRONIZATION", RMLFlags::ONLY_TIME_SYNCHRONIZATION)
             .value("ONLY_PHASE_SYNCHRONIZATION", RMLFlags::ONLY_PHASE_SYNCHRONIZATION)
             .value("NO_SYNCHRONIZATION", RMLFlags::NO_SYNCHRONIZATION)
+            .export_values()
         ;
-        py::enum_<RMLFlags::PositionalLimitsEnum>("PositionalLimits")
+        py::enum_<RMLFlags::PositionalLimitsEnum>("PositionalLimitsEnum")
             .value("POSITIONAL_LIMITS_IGNORE", RMLFlags::POSITIONAL_LIMITS_IGNORE)
             .value("POSITIONAL_LIMITS_ERROR_MSG_ONLY", RMLFlags::POSITIONAL_LIMITS_ERROR_MSG_ONLY)
             .value("POSITIONAL_LIMITS_ACTIVELY_PREVENT", RMLFlags::POSITIONAL_LIMITS_ACTIVELY_PREVENT)
+            .export_values()
         ;
     }
 
@@ -132,13 +135,15 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
             .def_readwrite("BehaviorIfInitialStateBreachesConstraints", &RMLPositionFlags::BehaviorIfInitialStateBreachesConstraints)
             .def_readwrite("KeepCurrentVelocityInCaseOfFallbackStrategy", &RMLPositionFlags::KeepCurrentVelocityInCaseOfFallbackStrategy)
         ;
-        py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>("FinalMotionBehavior")
+        py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>("FinalMotionBehaviorEnum")
             .value("KEEP_TARGET_VELOCITY", RMLPositionFlags::KEEP_TARGET_VELOCITY)
             .value("RECOMPUTE_TRAJECTORY", RMLPositionFlags::RECOMPUTE_TRAJECTORY)
+            .export_values()
         ;
-        py::enum_<RMLPositionFlags::BehaviorIfInitialStateBreachesConstraintsEnum>("BehaviorIfInitialStateBreachesConstraints")
+        py::enum_<RMLPositionFlags::BehaviorIfInitialStateBreachesConstraintsEnum>("BehaviorIfInitialStateBreachesConstraintsEnum")
             .value("GET_INTO_BOUNDARIES_FAST", RMLPositionFlags::GET_INTO_BOUNDARIES_FAST)
             .value("GET_INTO_BOUNDARIES_AT_ZERO_ACCELERATION", RMLPositionFlags::GET_INTO_BOUNDARIES_AT_ZERO_ACCELERATION)
+            .export_values()
         ;
     }
 
@@ -195,6 +200,7 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
             .value("IP_ORDER_OF_MAGNITUDE", RMLInputParameters::IP_ORDER_OF_MAGNITUDE)
             .value("IP_MINIMUM_SYNC_TIME", RMLInputParameters::IP_MINIMUM_SYNC_TIME)
             .value("IP_OVERRIDE_VALUE", RMLInputParameters::IP_OVERRIDE_VALUE)
+            .export_values()
         ;
     }
 
@@ -261,6 +267,7 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
         py::enum_<RMLOutputParameters::ReturnValue>("ReturnValue")
             .value("RETURN_SUCCESS", RMLOutputParameters::RETURN_SUCCESS)
             .value("RETURN_ERROR", RMLOutputParameters::RETURN_ERROR)
+            .export_values()
         ;
     }
 

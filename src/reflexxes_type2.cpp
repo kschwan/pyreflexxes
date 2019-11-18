@@ -85,6 +85,7 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
             .value("RML_ERROR_NULL_POINTER", ReflexxesAPI::RML_ERROR_NULL_POINTER)
             .value("RML_ERROR_EXECUTION_TIME_TOO_BIG", ReflexxesAPI::RML_ERROR_EXECUTION_TIME_TOO_BIG)
             .value("RML_ERROR_USER_TIME_OUT_OF_RANGE", ReflexxesAPI::RML_ERROR_USER_TIME_OUT_OF_RANGE)
+            .export_values()
         ;
     }
 
@@ -97,11 +98,12 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
             .def_readwrite("SynchronizationBehavior", &RMLFlags::SynchronizationBehavior)
             .def_readwrite("EnableTheCalculationOfTheExtremumMotionStates", &RMLFlags::EnableTheCalculationOfTheExtremumMotionStates)
         ;
-        py::enum_<RMLFlags::SyncBehaviorEnum>("SyncBehavior")
+        py::enum_<RMLFlags::SyncBehaviorEnum>("SyncBehaviorEnum")
             .value("PHASE_SYNCHRONIZATION_IF_POSSIBLE", RMLFlags::PHASE_SYNCHRONIZATION_IF_POSSIBLE)
             .value("ONLY_TIME_SYNCHRONIZATION", RMLFlags::ONLY_TIME_SYNCHRONIZATION)
             .value("ONLY_PHASE_SYNCHRONIZATION", RMLFlags::ONLY_PHASE_SYNCHRONIZATION)
             .value("NO_SYNCHRONIZATION", RMLFlags::NO_SYNCHRONIZATION)
+            .export_values()
         ;
     }
 
@@ -114,9 +116,10 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
             .def_readwrite("BehaviorAfterFinalStateOfMotionIsReached", &RMLPositionFlags::BehaviorAfterFinalStateOfMotionIsReached)
             .def_readwrite("KeepCurrentVelocityInCaseOfFallbackStrategy", &RMLPositionFlags::KeepCurrentVelocityInCaseOfFallbackStrategy)
         ;
-        py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>("FinalMotionBehavior")
+        py::enum_<RMLPositionFlags::FinalMotionBehaviorEnum>("FinalMotionBehaviorEnum")
             .value("KEEP_TARGET_VELOCITY", RMLPositionFlags::KEEP_TARGET_VELOCITY)
             .value("RECOMPUTE_TRAJECTORY", RMLPositionFlags::RECOMPUTE_TRAJECTORY)
+            .export_values()
         ;
     }
 
@@ -183,9 +186,9 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
         // See https://www.boost.org/doc/libs/1_65_0/libs/python/doc/html/faq/is_return_internal_reference_eff.html
         py::scope scope =
         py::class_<RMLOutputParameters, boost::noncopyable>("RMLOutputParameters", py::no_init) // Base class with protected ctor (including copy ctor)
-            .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs)
             .def_readonly("ANewCalculationWasPerformed", &RMLOutputParameters::ANewCalculationWasPerformed)
             .def_readonly("TrajectoryIsPhaseSynchronized", &RMLOutputParameters::TrajectoryIsPhaseSynchronized)
+            .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs)
             .def_readonly("DOFWithTheGreatestExecutionTime", &RMLOutputParameters::DOFWithTheGreatestExecutionTime)
             .def_readonly("SynchronizationTime", &RMLOutputParameters::SynchronizationTime)
             .add_property("NewPositionVector", +[](const RMLOutputParameters& self) { return *self.NewPositionVector; })
@@ -214,6 +217,7 @@ BOOST_PYTHON_MODULE(reflexxes_type2)
         py::enum_<RMLOutputParameters::ReturnValue>("ReturnValue")
             .value("RETURN_SUCCESS", RMLOutputParameters::RETURN_SUCCESS)
             .value("RETURN_ERROR", RMLOutputParameters::RETURN_ERROR)
+            .export_values()
         ;
     }
 

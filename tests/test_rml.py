@@ -11,7 +11,7 @@ class TestRML(unittest.TestCase):
         flags1 = reflexxes.RMLPositionFlags()
         flags2 = reflexxes.RMLPositionFlags()
         assert flags1 == flags2
-        flags1.SynchronizationBehavior = reflexxes.RMLFlags.SyncBehavior.NO_SYNCHRONIZATION
+        flags1.SynchronizationBehavior = reflexxes.RMLFlags.NO_SYNCHRONIZATION
         assert flags1 != flags2
 
     def test_vector(self):
