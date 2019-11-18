@@ -61,8 +61,8 @@ class PositionTrajectoryGenerator(object):
         if max_jerk:  # needed for RML Type IV
             self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
 
-    def trajectory(self, target_position, target_velocity=None, min_sync_time=0):
-        self.ip.MinimumSynchronizationTime = min_sync_time
+    def trajectory(self, target_position, target_velocity=None, min_sync_time=None):
+        self.ip.MinimumSynchronizationTime = 0.0 if min_sync_time is None else min_sync_time
         self.ip.TargetPositionVector = RMLDoubleVector(target_position)
 
         if target_velocity is None:

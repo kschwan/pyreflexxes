@@ -4,12 +4,12 @@
 #include <boost/python/list.hpp>
 
 template<typename Iterator>
-inline auto make_list(Iterator begin, Iterator end)
+inline auto make_list(Iterator first, Iterator last)
 {
     boost::python::list list;
 
-    for (; begin != end; ++begin) {
-        list.append(*begin);
+    for (; first != last; ++first) {
+        list.append(*first);
     }
 
     return list;

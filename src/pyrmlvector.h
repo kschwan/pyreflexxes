@@ -40,47 +40,29 @@ std::ostream& operator<<(std::ostream& os, const RMLVector<T>& v)
     return os;
 }
 
-// Copy RMLVector elements to Python list
-template<typename T>
-inline auto make_list(const RMLVector<T>& v)
-{
-    boost::python::list list;
-
-    for (unsigned i = 0; i < v.VectorDimension; ++i) {
-        list.append(v.VecData[i]);
-    }
-
-    return list;
-}
-
-// Create an RMLVector from a Python iterable
-template<typename T>
-std::shared_ptr<RMLVector<T>> make_vector(const boost::python::object& iterable)
-{
-    using size_type = decltype(RMLVector<T>::VectorDimension);
-    auto n = static_cast<size_type>(boost::python::len(iterable));
-
-    if (n == 0)
-        throw std::invalid_argument("RMLVector does not support being empty");
-
-    auto v = std::make_shared<RMLVector<T>>(n);
-
-    for (size_type i = 0; i < n; ++i) {
-        v->VecData[i] = boost::python::extract<T>(iterable[i]);
-    }
-
-    return v;
-}
-
 // Expose a template instantiation of RMLVector
 template<typename T>
 void expose_RMLVector()
 {
+    namespace py = boost::python;
+
     using size_type = decltype(RMLVector<T>::VectorDimension);
     using difference_type = typename std::make_signed<size_type>::type;
 
-    boost::python::class_<RMLVector<T>>(RMLVectorName<RMLVector<T>>::value(), boost::python::no_init)
-        .def("__init__", boost::python::make_constructor(make_vector<T>))
+    py::class_<RMLVector<T>>(RMLVectorName<RMLVector<T>>::value(), py::no_init)
+        .def("__init__", py::make_constructor(+[](py::object iterable) {
+            auto n = static_cast<size_type>(py::len(iterable));
+
+            if (n == 0)
+                throw std::invalid_argument("RMLVector does not support being empty");
+
+            auto v = std::make_shared<RMLVector<T>>(n);
+
+            for (size_type i = 0; i < n; ++i)
+                v->VecData[i] = py::extract<T>(iterable[i]);
+
+            return v;
+        }))
         .def("__len__", &RMLVector<T>::GetVecDim)
         .def("__getitem__",
             +[](const RMLVector<T>& self, difference_type i) {
@@ -98,12 +80,12 @@ void expose_RMLVector()
                     throw std::out_of_range("RMLVector index out of range");
                 self.VecData[(size_type)i] = val;
              })
-        .def("__iter__", boost::python::range(+[](RMLVector<T>& self) { return self.VecData; }, +[](RMLVector<T>& self) { return self.VecData + self.VectorDimension; }))
+        .def("__iter__", py::range(+[](const RMLVector<T>& self) { return self.VecData; }, +[](const RMLVector<T>& self) { return std::next(self.VecData, self.VectorDimension); }))
         .def("__eq__", &RMLVector<T>::operator==)
         .def("__ne__", &RMLVector<T>::operator!=)
         .def("Set", &RMLVector<T>::Set)
-        .def("tolist", +[](const RMLVector<T>& self) { return make_list(self); })
-        .def(repr(boost::python::self))
+        .def("tolist", +[](const RMLVector<T>& self) { return make_list(self.VecData, std::next(self.VecData, self.VectorDimension)); })
+        .def(repr(py::self))
     ;
 }
 

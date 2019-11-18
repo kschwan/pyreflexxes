@@ -59,9 +59,6 @@ std::string error_string(int val)
     }
 }
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(RMLPositionInputParameters_CheckForValidity_overloads, CheckForValidity, 0, 2)
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(RMLVelocityInputParameters_CheckForValidity_overloads, CheckForValidity, 0, 2)
-
 BOOST_PYTHON_MODULE(reflexxes_type4)
 {
     namespace py = boost::python;
@@ -162,32 +159,32 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
             .def_readwrite("MinimumSynchronizationTime", &RMLInputParameters::MinimumSynchronizationTime)
             .def_readwrite("OverrideValue", &RMLInputParameters::OverrideValue)
             .add_property("SelectionVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.SelectionVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLBoolVector& v) { *self.SelectionVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.SelectionVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLBoolVector& v) { *self.SelectionVector = v; }))
             .add_property("CurrentPositionVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.CurrentPositionVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentPositionVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.CurrentPositionVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentPositionVector = v; }))
             .add_property("CurrentVelocityVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.CurrentVelocityVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentVelocityVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.CurrentVelocityVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentVelocityVector = v; }))
             .add_property("CurrentAccelerationVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.CurrentAccelerationVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentAccelerationVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.CurrentAccelerationVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentAccelerationVector = v; }))
             .add_property("MaxAccelerationVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.MaxAccelerationVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxAccelerationVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.MaxAccelerationVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxAccelerationVector = v; }))
             .add_property("MaxJerkVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.MaxJerkVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxJerkVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.MaxJerkVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxJerkVector = v; }))
             .add_property("TargetVelocityVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.TargetVelocityVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.TargetVelocityVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.TargetVelocityVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.TargetVelocityVector = v; }))
             .add_property("MaxPositionVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.MaxPositionVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxPositionVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.MaxPositionVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxPositionVector = v; }))
             .add_property("MinPositionVector",
-                          py::make_function(+[](const RMLInputParameters& self) { return self.MinPositionVector; }, py::return_internal_reference<>()),
-                          py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MinPositionVector = v; }))
+                py::make_function(+[](const RMLInputParameters& self) { return self.MinPositionVector; }, py::return_internal_reference<>()),
+                py::make_function(+[](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MinPositionVector = v; }))
         ;
         py::enum_<RMLInputParameters::ErrorCodeForInvalidInputValues>("ErrorCodeForInvalidInputValues")
             .value("IP_NO_ERROR", RMLInputParameters::IP_NO_ERROR)
@@ -203,41 +200,21 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
 
     // RMLPositionInputParameters
     py::class_<RMLPositionInputParameters, py::bases<RMLInputParameters>>("RMLPositionInputParameters", py::init<unsigned>())
-        .def("CheckForValidity", &RMLPositionInputParameters::CheckForValidity, RMLPositionInputParameters_CheckForValidity_overloads())
+        .def("CheckForValidity", +[](const RMLPositionInputParameters& self) { return self.CheckForValidity(); })
         .add_property("MaxVelocityVector",
-                      py::make_function(+[](const RMLPositionInputParameters& self) { return self.MaxVelocityVector; }, py::return_internal_reference<>()),
-                      py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.MaxVelocityVector = v; }))
+            py::make_function(+[](const RMLPositionInputParameters& self) { return self.MaxVelocityVector; }, py::return_internal_reference<>()),
+            py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.MaxVelocityVector = v; }))
         .add_property("TargetPositionVector",
-                      py::make_function(+[](const RMLPositionInputParameters& self) { return self.TargetPositionVector; }, py::return_internal_reference<>()),
-                      py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.TargetPositionVector = v; }))
+            py::make_function(+[](const RMLPositionInputParameters& self) { return self.TargetPositionVector; }, py::return_internal_reference<>()),
+            py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.TargetPositionVector = v; }))
         .add_property("AlternativeTargetVelocityVector",
-                      py::make_function(+[](const RMLPositionInputParameters& self) { return self.AlternativeTargetVelocityVector; }, py::return_internal_reference<>()),
-                      py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.AlternativeTargetVelocityVector = v; }))
+            py::make_function(+[](const RMLPositionInputParameters& self) { return self.AlternativeTargetVelocityVector; }, py::return_internal_reference<>()),
+            py::make_function(+[](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.AlternativeTargetVelocityVector = v; }))
     ;
 
     // RMLVelocityInputParameters
     py::class_<RMLVelocityInputParameters, py::bases<RMLInputParameters>>("RMLVelocityInputParameters", py::init<unsigned>())
-        .def("CheckForValidity", &RMLVelocityInputParameters::CheckForValidity, RMLVelocityInputParameters_CheckForValidity_overloads())
-    ;
-
-    // RMLPolynomial
-    py::class_<RMLPolynomial>("RMLPolynomial")
-        .add_property("PositionPolynomialCoefficients",
-                      +[](const RMLPolynomial& self) { return make_list(std::begin(self.PositionPolynomialCoefficients), std::end(self.PositionPolynomialCoefficients)); })
-        .add_property("VelocityPolynomialCoefficients",
-                      +[](const RMLPolynomial& self) { return make_list(std::begin(self.VelocityPolynomialCoefficients), std::end(self.VelocityPolynomialCoefficients)); })
-        .add_property("AccelerationPolynomialCoefficients",
-                      +[](const RMLPolynomial& self) { return make_list(std::begin(self.AccelerationPolynomialCoefficients), std::end(self.AccelerationPolynomialCoefficients)); })
-        .def_readonly("Time_ValidUntil", &RMLPolynomial::Time_ValidUntil)
-    ;
-
-    // RMLOutputPolynomials
-    py::class_<RMLOutputPolynomials>("RMLOutputPolynomials", py::init<unsigned>())
-        .def_readonly("NumberOfDOFs", &RMLOutputPolynomials::NumberOfDOFs)
-        .add_property("NumberOfCurrentlyValidSegments",
-                      +[](const RMLOutputPolynomials& self) { return make_list(self.NumberOfCurrentlyValidSegments, std::next(self.NumberOfCurrentlyValidSegments, self.NumberOfDOFs)); })
-        .add_property("Coefficients",
-                      +[](const RMLOutputPolynomials& self) { return make_list(self.Coefficients, std::next(self.Coefficients, self.NumberOfDOFs)); })
+        .def("CheckForValidity", +[](const RMLVelocityInputParameters& self) { return self.CheckForValidity(); })
     ;
 
     // RMLOutputParameters
@@ -267,17 +244,17 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
             .add_property("ExecutionTimes", +[](const RMLOutputParameters& self) { return *self.ExecutionTimes; })
             // The returned lists contain copies of RMLVectors pointed to
             .add_property("MinPosExtremaPositionVectorArray",
-                          +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
+                +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
             .add_property("MinPosExtremaVelocityVectorArray",
-                          +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaVelocityVectorArray, std::next(self.MinPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
+                +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaVelocityVectorArray, std::next(self.MinPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
             .add_property("MinPosExtremaAccelerationVectorArray",
-                          +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaAccelerationVectorArray, std::next(self.MinPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
+                +[](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaAccelerationVectorArray, std::next(self.MinPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
             .add_property("MaxPosExtremaPositionVectorArray",
-                          +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaPositionVectorArray, std::next(self.MaxPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
+                +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaPositionVectorArray, std::next(self.MaxPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
             .add_property("MaxPosExtremaVelocityVectorArray",
-                          +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaVelocityVectorArray, std::next(self.MaxPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
+                +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaVelocityVectorArray, std::next(self.MaxPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
             .add_property("MaxPosExtremaAccelerationVectorArray",
-                          +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaAccelerationVectorArray, std::next(self.MaxPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
+                +[](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaAccelerationVectorArray, std::next(self.MaxPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
             .add_property("Polynomials", +[](const RMLOutputParameters& self) { return *self.Polynomials; })
         ;
 
@@ -295,5 +272,25 @@ BOOST_PYTHON_MODULE(reflexxes_type4)
     // RMLVelocityOutputParameters
     py::class_<RMLVelocityOutputParameters, py::bases<RMLOutputParameters>>("RMLVelocityOutputParameters", py::init<unsigned>())
         .add_property("PositionValuesAtTargetVelocity", +[](const RMLVelocityOutputParameters& self) { return *self.PositionValuesAtTargetVelocity; })
+    ;
+
+    // RMLPolynomial
+    py::class_<RMLPolynomial>("RMLPolynomial")
+        .add_property("PositionPolynomialCoefficients",
+            +[](const RMLPolynomial& self) { return make_list(std::begin(self.PositionPolynomialCoefficients), std::end(self.PositionPolynomialCoefficients)); })
+        .add_property("VelocityPolynomialCoefficients",
+            +[](const RMLPolynomial& self) { return make_list(std::begin(self.VelocityPolynomialCoefficients), std::end(self.VelocityPolynomialCoefficients)); })
+        .add_property("AccelerationPolynomialCoefficients",
+            +[](const RMLPolynomial& self) { return make_list(std::begin(self.AccelerationPolynomialCoefficients), std::end(self.AccelerationPolynomialCoefficients)); })
+        .def_readonly("Time_ValidUntil", &RMLPolynomial::Time_ValidUntil)
+    ;
+
+    // RMLOutputPolynomials
+    py::class_<RMLOutputPolynomials>("RMLOutputPolynomials", py::init<unsigned>())
+        .def_readonly("NumberOfDOFs", &RMLOutputPolynomials::NumberOfDOFs)
+        .add_property("NumberOfCurrentlyValidSegments",
+            +[](const RMLOutputPolynomials& self) { return make_list(self.NumberOfCurrentlyValidSegments, std::next(self.NumberOfCurrentlyValidSegments, self.NumberOfDOFs)); })
+        .add_property("Coefficients",
+            +[](const RMLOutputPolynomials& self) { return make_list(self.Coefficients, std::next(self.Coefficients, self.NumberOfDOFs)); })
     ;
 }
