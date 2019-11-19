@@ -60,6 +60,20 @@ PYBIND11_MODULE(reflexxes_type2, m)
 
     m.def("error_string", error_string);
 
+    // These "feedback" functions are an optimization: They copy the "new"-vectors
+    // of the output paramers to the "current"-vectors of the input parameters.
+    // This saves lots of unnecessary conversions between RMLVectors and Python lists.
+    m.def("feedback", [](RMLPositionInputParameters& ip, const RMLPositionOutputParameters& op) {
+        *ip.CurrentPositionVector = *op.NewPositionVector;
+        *ip.CurrentVelocityVector = *op.NewVelocityVector;
+        *ip.CurrentAccelerationVector = *op.NewAccelerationVector;
+    });
+    m.def("feedback", [](RMLVelocityInputParameters& ip, const RMLVelocityOutputParameters& op) {
+        *ip.CurrentPositionVector = *op.NewPositionVector;
+        *ip.CurrentVelocityVector = *op.NewVelocityVector;
+        *ip.CurrentAccelerationVector = *op.NewAccelerationVector;
+    }, "Copy the \"new\"-vectors (position, velocity, acceleration) of the output params to the \"current\"-vectors of the input params");
+
     // ReflexxesAPI
     auto reflexxes_api = py::class_<ReflexxesAPI>(m, "ReflexxesAPI")
         .def(py::init<unsigned, double>())

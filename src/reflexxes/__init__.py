@@ -2,6 +2,7 @@ try:
     # Prefer Type IV
     from .reflexxes_type4 import (
         error_string,
+        feedback,
         ReflexxesAPI,
         RMLFlags,
         RMLInputParameters,
@@ -19,6 +20,7 @@ try:
 except ImportError:
     from .reflexxes_type2 import (
         error_string,
+        feedback,
         ReflexxesAPI,
         RMLFlags,
         RMLInputParameters,
@@ -146,10 +148,9 @@ class PositionTrajectory(object):
         if ret == ReflexxesAPI.RML_FINAL_STATE_REACHED:
             raise StopIteration
 
-        # Feedback
-        self.ip.CurrentPositionVector = self.op.NewPositionVector
-        self.ip.CurrentVelocityVector = self.op.NewVelocityVector
-        self.ip.CurrentAccelerationVector = self.op.NewAccelerationVector
+        # Copy "new" position, velocity and acceleration vectors of the input
+        # parameters to the "current" vector of the output parameters
+        feedback(self.ip, self.op)
 
         return self.op.NewPositionVector, self.op.NewVelocityVector, self.op.NewAccelerationVector
 
