@@ -14,31 +14,6 @@ class TestRML(unittest.TestCase):
         flags1.SynchronizationBehavior = reflexxes.RMLFlags.NO_SYNCHRONIZATION
         assert flags1 != flags2
 
-    def test_vector(self):
-        v1 = reflexxes.RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
-        v2 = reflexxes.RMLDoubleVector([1, 2, 3, 4, 5, 6, 7])
-        assert v1 == v2
-        assert v1 != reflexxes.RMLDoubleVector([0, 2, 3, 4, 5, 6, 7])
-        v2[1] = 99
-        v2[-1] = 999
-        assert v2 == reflexxes.RMLDoubleVector([1, 99, 3, 4, 5, 6, 999])
-
-        v3 = reflexxes.RMLDoubleVector([0]*123)
-        v4 = reflexxes.RMLDoubleVector([0]*123)
-        assert 123 == len(v3) == len(v4)
-
-        for i in range(len(v3)):
-            v3[i] = i
-            v4[i] = i
-
-        for i, val in enumerate(v3):
-            assert val == i
-
-        assert v3 == v4
-
-        with self.assertRaises(IndexError):
-            val = v3[len(v3)+1]
-
     def test_api(self):
         NUMBER_OF_DOFS = 3
         CYCLE_TIME_IN_SECONDS = 0.001
@@ -48,18 +23,18 @@ class TestRML(unittest.TestCase):
         ip = reflexxes.RMLPositionInputParameters(NUMBER_OF_DOFS)
         op = reflexxes.RMLPositionOutputParameters(NUMBER_OF_DOFS)
 
-        ip.SelectionVector = reflexxes.RMLBoolVector([True, True, True])
+        ip.SelectionVector = [True, True, True]
 
-        ip.CurrentPositionVector = reflexxes.RMLDoubleVector([100, 0, 50])
-        ip.CurrentVelocityVector = reflexxes.RMLDoubleVector([100, -220, -50])
-        ip.CurrentAccelerationVector = reflexxes.RMLDoubleVector([-150, 250, -50])
+        ip.CurrentPositionVector = [100, 0, 50]
+        ip.CurrentVelocityVector = [100, -220, -50]
+        ip.CurrentAccelerationVector = [-150, 250, -50]
 
-        ip.MaxVelocityVector = reflexxes.RMLDoubleVector([300, 100, 300])
-        ip.MaxAccelerationVector = reflexxes.RMLDoubleVector([300, 200, 100])
-        ip.MaxJerkVector = reflexxes.RMLDoubleVector([400, 300, 200])
+        ip.MaxVelocityVector = [300, 100, 300]
+        ip.MaxAccelerationVector = [300, 200, 100]
+        ip.MaxJerkVector = [400, 300, 200]
 
-        ip.TargetPositionVector = reflexxes.RMLDoubleVector([-600, -200, -350])
-        ip.TargetVelocityVector = reflexxes.RMLDoubleVector([50, -50, -200])
+        ip.TargetPositionVector = [-600, -200, -350]
+        ip.TargetVelocityVector = [50, -50, -200]
 
         assert ip.CheckForValidity()
 

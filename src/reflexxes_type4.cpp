@@ -16,7 +16,7 @@
  */
 
 #include "makelist.h"
-#include "pyrmlvector.h"
+#include "vector_type_caster.h"
 
 #include <ReflexxesAPI.h>
 
@@ -58,7 +58,7 @@ std::string error_string(int val)
         return "(Not enumerated): Unknown error or return value";
     }
 }
-}
+} // namespace
 
 PYBIND11_MODULE(reflexxes_type4, m)
 {
@@ -66,14 +66,8 @@ PYBIND11_MODULE(reflexxes_type4, m)
 
     m.def("error_string", error_string);
 
-    // RMLVector(s)
-    expose_RMLVector<bool>(m, "RMLBoolVector");
-    expose_RMLVector<int>(m, "RMLIntVector");
-    expose_RMLVector<double>(m, "RMLDoubleVector");
-
     // ReflexxesAPI
-    py::class_<ReflexxesAPI> reflexxes_api(m, "ReflexxesAPI");
-    reflexxes_api
+    auto reflexxes_api = py::class_<ReflexxesAPI>(m, "ReflexxesAPI")
         .def(py::init<unsigned, double>())
         .def(py::init<unsigned, double, unsigned>())
         .def(py::init<unsigned, double, unsigned, double>())
@@ -101,8 +95,7 @@ PYBIND11_MODULE(reflexxes_type4, m)
     ;
 
     // RMLFlags
-    py::class_<RMLFlags> rml_flags(m, "RMLFlags");
-    rml_flags
+    auto rml_flags = py::class_<RMLFlags>(m, "RMLFlags")
         .def("__eq__", &RMLFlags::operator==)
         .def("__ne__", &RMLFlags::operator!=)
         .def_readwrite("SynchronizationBehavior", &RMLFlags::SynchronizationBehavior)
@@ -124,8 +117,7 @@ PYBIND11_MODULE(reflexxes_type4, m)
     ;
 
     // RMLPositionFlags
-    py::class_<RMLPositionFlags, RMLFlags> rml_position_flags(m, "RMLPositionFlags");
-    rml_position_flags
+    auto rml_position_flags = py::class_<RMLPositionFlags, RMLFlags>(m, "RMLPositionFlags")
         .def(py::init<>())
         .def("__eq__", &RMLPositionFlags::operator==)
         .def("__ne__", &RMLPositionFlags::operator!=)
@@ -151,8 +143,7 @@ PYBIND11_MODULE(reflexxes_type4, m)
     ;
 
     // RMLInputParameters
-    py::class_<RMLInputParameters> rml_input_parameters(m, "RMLInputParameters");
-    rml_input_parameters
+    auto rml_input_parameters = py::class_<RMLInputParameters>(m, "RMLInputParameters")
         .def_readonly("NumberOfDOFs", &RMLInputParameters::NumberOfDOFs)
         .def_readwrite("MinimumSynchronizationTime", &RMLInputParameters::MinimumSynchronizationTime)
         .def_readwrite("OverrideValue", &RMLInputParameters::OverrideValue)
@@ -218,61 +209,54 @@ PYBIND11_MODULE(reflexxes_type4, m)
     ;
 
     // RMLOutputParameters
-    py::class_<RMLOutputParameters> rml_output_parameters(m, "RMLOutputParameters");
-    rml_output_parameters
+    auto rml_output_parameters = py::class_<RMLOutputParameters>(m, "RMLOutputParameters")
         .def("GetErrorString", [](const RMLOutputParameters& self) { return std::string(self.GetErrorString()); })
-        .def_readonly("ANewCalculationWasPerformed", &RMLOutputParameters::ANewCalculationWasPerformed, py::return_value_policy::copy)
-        .def_readonly("TrajectoryIsPhaseSynchronized", &RMLOutputParameters::TrajectoryIsPhaseSynchronized, py::return_value_policy::copy)
-        .def_readonly("OverrideFilterIsActive", &RMLOutputParameters::OverrideFilterIsActive, py::return_value_policy::copy)
-        .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs, py::return_value_policy::copy)
-        .def_readonly("DOFWithTheGreatestExecutionTime", &RMLOutputParameters::DOFWithTheGreatestExecutionTime, py::return_value_policy::copy)
-        .def_readonly("ResultValue", &RMLOutputParameters::ResultValue, py::return_value_policy::copy)
-        .def_readonly("SynchronizationTime", &RMLOutputParameters::SynchronizationTime, py::return_value_policy::copy)
-        .def_readonly("CurrentOverrideValue", &RMLOutputParameters::CurrentOverrideValue, py::return_value_policy::copy)
-        .def_readonly("NewPositionVector", &RMLOutputParameters::NewPositionVector, py::return_value_policy::copy)
-        .def_readonly("NewVelocityVector", &RMLOutputParameters::NewVelocityVector, py::return_value_policy::copy)
-        .def_readonly("NewAccelerationVector", &RMLOutputParameters::NewAccelerationVector, py::return_value_policy::copy)
-        .def_readonly("MinExtremaTimesVector", &RMLOutputParameters::MinExtremaTimesVector, py::return_value_policy::copy)
-        .def_readonly("MaxExtremaTimesVector", &RMLOutputParameters::MaxExtremaTimesVector, py::return_value_policy::copy)
-        .def_readonly("MinPosExtremaPositionVectorOnly", &RMLOutputParameters::MinPosExtremaPositionVectorOnly, py::return_value_policy::copy)
-        .def_readonly("MaxPosExtremaPositionVectorOnly", &RMLOutputParameters::MaxPosExtremaPositionVectorOnly, py::return_value_policy::copy)
-        .def_readonly("ExecutionTimes", &RMLOutputParameters::ExecutionTimes, py::return_value_policy::copy)
+        .def_readonly("ANewCalculationWasPerformed", &RMLOutputParameters::ANewCalculationWasPerformed)
+        .def_readonly("TrajectoryIsPhaseSynchronized", &RMLOutputParameters::TrajectoryIsPhaseSynchronized)
+        .def_readonly("OverrideFilterIsActive", &RMLOutputParameters::OverrideFilterIsActive)
+        .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs)
+        .def_readonly("DOFWithTheGreatestExecutionTime", &RMLOutputParameters::DOFWithTheGreatestExecutionTime)
+        .def_readonly("ResultValue", &RMLOutputParameters::ResultValue)
+        .def_readonly("SynchronizationTime", &RMLOutputParameters::SynchronizationTime)
+        .def_readonly("CurrentOverrideValue", &RMLOutputParameters::CurrentOverrideValue)
+        .def_readonly("NewPositionVector", &RMLOutputParameters::NewPositionVector)
+        .def_readonly("NewVelocityVector", &RMLOutputParameters::NewVelocityVector)
+        .def_readonly("NewAccelerationVector", &RMLOutputParameters::NewAccelerationVector)
+        .def_readonly("MinExtremaTimesVector", &RMLOutputParameters::MinExtremaTimesVector)
+        .def_readonly("MaxExtremaTimesVector", &RMLOutputParameters::MaxExtremaTimesVector)
+        .def_readonly("MinPosExtremaPositionVectorOnly", &RMLOutputParameters::MinPosExtremaPositionVectorOnly)
+        .def_readonly("MaxPosExtremaPositionVectorOnly", &RMLOutputParameters::MaxPosExtremaPositionVectorOnly)
+        .def_readonly("ExecutionTimes", &RMLOutputParameters::ExecutionTimes)
         .def_property_readonly("MinPosExtremaPositionVectorArray",
-            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); },
-            py::return_value_policy::copy)
+            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
         .def_property_readonly("MinPosExtremaVelocityVectorArray",
-            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaVelocityVectorArray, std::next(self.MinPosExtremaVelocityVectorArray, self.NumberOfDOFs)); },
-            py::return_value_policy::copy)
+            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaVelocityVectorArray, std::next(self.MinPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
         .def_property_readonly("MinPosExtremaAccelerationVectorArray",
-            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaAccelerationVectorArray, std::next(self.MinPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); },
-            py::return_value_policy::copy)
+            [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaAccelerationVectorArray, std::next(self.MinPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
         .def_property_readonly("MaxPosExtremaPositionVectorArray",
-            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaPositionVectorArray, std::next(self.MaxPosExtremaPositionVectorArray, self.NumberOfDOFs)); },
-            py::return_value_policy::copy)
+            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaPositionVectorArray, std::next(self.MaxPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
         .def_property_readonly("MaxPosExtremaVelocityVectorArray",
-            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaVelocityVectorArray, std::next(self.MaxPosExtremaVelocityVectorArray, self.NumberOfDOFs)); },
-            py::return_value_policy::copy)
+            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaVelocityVectorArray, std::next(self.MaxPosExtremaVelocityVectorArray, self.NumberOfDOFs)); })
         .def_property_readonly("MaxPosExtremaAccelerationVectorArray",
-            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaAccelerationVectorArray, std::next(self.MaxPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); },
-            py::return_value_policy::copy)
+            [](const RMLOutputParameters& self) { return make_list(self.MaxPosExtremaAccelerationVectorArray, std::next(self.MaxPosExtremaAccelerationVectorArray, self.NumberOfDOFs)); })
         .def_readonly("ExecutionTimes", &RMLOutputParameters::Polynomials, py::return_value_policy::copy)
     ;
-
     py::enum_<RMLOutputParameters::ReturnValue>(rml_output_parameters, "ReturnValue")
         .value("RETURN_SUCCESS", RMLOutputParameters::RETURN_SUCCESS)
         .value("RETURN_ERROR", RMLOutputParameters::RETURN_ERROR)
         .export_values()
     ;
+
     // RMLPositionOutputParameters
     py::class_<RMLPositionOutputParameters, RMLOutputParameters>(m, "RMLPositionOutputParameters")
         .def(py::init<unsigned>())
-        .def_readonly("TrajectoryExceedsTargetPosition", &RMLPositionOutputParameters::TrajectoryExceedsTargetPosition, py::return_value_policy::copy)
+        .def_readonly("TrajectoryExceedsTargetPosition", &RMLPositionOutputParameters::TrajectoryExceedsTargetPosition)
     ;
 
     // RMLVelocityOutputParameters
     py::class_<RMLVelocityOutputParameters, RMLOutputParameters>(m, "RMLVelocityOutputParameters")
         .def(py::init<unsigned>())
-        .def_readonly("PositionValuesAtTargetVelocity", &RMLVelocityOutputParameters::PositionValuesAtTargetVelocity, py::return_value_policy::copy)
+        .def_readonly("PositionValuesAtTargetVelocity", &RMLVelocityOutputParameters::PositionValuesAtTargetVelocity)
     ;
 
     // RMLPolynomial

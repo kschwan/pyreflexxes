@@ -16,7 +16,7 @@
  */
 
 #include "makelist.h"
-#include "pyrmlvector.h"
+#include "vector_type_caster.h"
 
 #include <ReflexxesAPI.h>
 
@@ -52,18 +52,13 @@ std::string error_string(int val)
         return "(Not enumerated): Unknown error or return value";
     }
 }
-}
+} // namespace
 
 PYBIND11_MODULE(reflexxes_type2, m)
 {
     namespace py = pybind11;
 
     m.def("error_string", error_string);
-
-    // RMLVector(s)
-    expose_RMLVector<bool>(m, "RMLBoolVector");
-    expose_RMLVector<int>(m, "RMLIntVector");
-    expose_RMLVector<double>(m, "RMLDoubleVector");
 
     // ReflexxesAPI
     py::class_<ReflexxesAPI> reflexxes_api(m, "ReflexxesAPI");

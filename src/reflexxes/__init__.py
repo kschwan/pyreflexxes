@@ -3,11 +3,8 @@ try:
     from .reflexxes_type4 import (
         error_string,
         ReflexxesAPI,
-        RMLBoolVector,
-        RMLDoubleVector,
         RMLFlags,
         RMLInputParameters,
-        RMLIntVector,
         RMLOutputParameters,
         RMLOutputPolynomials,
         RMLPolynomial,
@@ -23,11 +20,8 @@ except ImportError:
     from .reflexxes_type2 import (
         error_string,
         ReflexxesAPI,
-        RMLBoolVector,
-        RMLDoubleVector,
         RMLFlags,
         RMLInputParameters,
-        RMLIntVector,
         RMLOutputParameters,
         RMLPositionFlags,
         RMLPositionInputParameters,
@@ -54,72 +48,73 @@ class PositionTrajectoryGenerator(object):
         self.op = RMLPositionOutputParameters(n_dof)
         self.flags = RMLPositionFlags()
 
-        self.ip.SelectionVector.Set(True)
-        self.ip.MaxVelocityVector = RMLDoubleVector(max_velocity)
-        self.ip.MaxAccelerationVector = RMLDoubleVector(max_acceleration)
+        self.ip.SelectionVector = [True] * n_dof
+        self.ip.MaxVelocityVector = max_velocity
+        self.ip.MaxAccelerationVector = max_acceleration
 
         if max_jerk:  # needed for RML Type IV
-            self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
+            self.ip.MaxJerkVector = max_jerk
 
     def trajectory(self, target_position, target_velocity=None, min_sync_time=None):
         self.ip.MinimumSynchronizationTime = 0.0 if min_sync_time is None else min_sync_time
-        self.ip.TargetPositionVector = RMLDoubleVector(target_position)
+        self.ip.TargetPositionVector = target_position
 
         if target_velocity is None:
-            self.ip.TargetVelocityVector.Set(0)
+            self.ip.TargetVelocityVector = [0] * self.n_dof
         else:
-            self.ip.TargetVelocityVector = RMLDoubleVector(target_velocity)
+            self.ip.TargetVelocityVector = target_velocity
 
         assert self.ip.CheckForValidity()
+
         return PositionTrajectory(self.rml, self.ip, self.op, self.flags)
 
     @property
     def max_velocity(self):
-        return self.ip.MaxVelocityVector.tolist()
+        return self.ip.MaxVelocityVector
 
     @max_velocity.setter
     def max_velocity(self, max_velocity):
-        self.ip.MaxVelocityVector = RMLDoubleVector(max_velocity)
+        self.ip.MaxVelocityVector = max_velocity
 
     @property
     def max_acceleration(self):
-        return self.ip.MaxAccelerationVector.tolist()
+        return self.ip.MaxAccelerationVector
 
     @max_acceleration.setter
     def max_acceleration(self, max_acceleration):
-        self.ip.MaxAccelerationVector = RMLDoubleVector(max_acceleration)
+        self.ip.MaxAccelerationVector = max_acceleration
 
     @property
     def max_jerk(self):
-        return self.ip.MaxJerkVector.tolist()
+        return self.ip.MaxJerkVector
 
     @max_jerk.setter
     def max_jerk(self, max_jerk):
-        self.ip.MaxJerkVector = RMLDoubleVector(max_jerk)
+        self.ip.MaxJerkVector = max_jerk
 
     @property
     def current_position(self):
-        return self.ip.CurrentPositionVector.tolist()
+        return self.ip.CurrentPositionVector
 
     @current_position.setter
     def current_position(self, position):
-        self.ip.CurrentPositionVector = RMLDoubleVector(position)
+        self.ip.CurrentPositionVector = position
 
     @property
     def current_velocity(self):
-        return self.ip.CurrentVelocityVector.tolist()
+        return self.ip.CurrentVelocityVector
 
     @current_velocity.setter
     def current_velocity(self, velocity):
-        self.ip.CurrentVelocityVector = RMLDoubleVector(velocity)
+        self.ip.CurrentVelocityVector = velocity
 
     @property
     def current_acceleration(self):
-        return self.ip.CurrentAccelerationVector.tolist()
+        return self.ip.CurrentAccelerationVector
 
     @current_acceleration.setter
     def current_acceleration(self, acceleration):
-        self.ip.CurrentAccelerationVector = RMLDoubleVector(acceleration)
+        self.ip.CurrentAccelerationVector = acceleration
 
 
 class PositionTrajectory(object):
