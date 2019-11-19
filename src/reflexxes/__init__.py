@@ -56,16 +56,10 @@ class PositionTrajectoryGenerator(object):
             self.ip.MaxJerkVector = max_jerk
 
     def trajectory(self, target_position, target_velocity=None, min_sync_time=None):
-        self.ip.MinimumSynchronizationTime = 0.0 if min_sync_time is None else min_sync_time
         self.ip.TargetPositionVector = target_position
-
-        if target_velocity is None:
-            self.ip.TargetVelocityVector = [0] * self.n_dof
-        else:
-            self.ip.TargetVelocityVector = target_velocity
-
+        self.ip.TargetVelocityVector = [0] * self.n_dof if target_velocity is None else target_velocity
+        self.ip.MinimumSynchronizationTime = 0.0 if min_sync_time is None else min_sync_time
         assert self.ip.CheckForValidity()
-
         return PositionTrajectory(self.rml, self.ip, self.op, self.flags)
 
     @property
