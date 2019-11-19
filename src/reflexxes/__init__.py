@@ -116,6 +116,22 @@ class PositionTrajectoryGenerator(object):
     def current_acceleration(self, acceleration):
         self.ip.CurrentAccelerationVector = acceleration
 
+    @property
+    def target_position(self):
+        return self.ip.TargetPositionVector
+
+    @target_position.setter
+    def target_position(self, position):
+        self.ip.TargetPositionVector = position
+
+    @property
+    def target_velocity(self):
+        return self.ip.TargetVelocityVector
+
+    @target_velocity.setter
+    def target_velocity(self, velocity):
+        self.ip.TargetVelocityVector = velocity
+
 
 class PositionTrajectory(object):
     def __init__(self, rml, ip, op, flags):
