@@ -13,10 +13,8 @@ namespace detail {
 template<typename T>
 struct type_caster<RMLVector<T>>
 {
-    using size_type = decltype(RMLVector<T>::VectorDimension);
-
     type_caster()
-        : value(0) // RMLVector<T> of size 0
+        : value(0) // RMLVector<T> of size 0, ie. new T[0] (lacking a default ctor)
     {}
 
     // Python to C++
@@ -27,18 +25,19 @@ struct type_caster<RMLVector<T>>
 
         auto s = reinterpret_borrow<sequence>(src);
 
-        // Possibly reallocate data array
+        // Possibly reallocate the data array
         if (value.VectorDimension != s.size()) {
             delete[] value.VecData;
-            value.VectorDimension = static_cast<size_type>(s.size());
+            value.VectorDimension = s.size();
             value.VecData = new T[value.VectorDimension];
         }
 
         // Copy data
-        size_type i = 0;
+        auto d = value.VecData;
 
         for (auto it : s) {
-            value.VecData[i++] = it.cast<T>();
+            *d = it.cast<T>();
+            ++d;
         }
 
         return true;
@@ -47,6 +46,9 @@ struct type_caster<RMLVector<T>>
     // C++ to Python
     static handle cast(const RMLVector<T>& src, return_value_policy /*policy*/, handle /*parent*/)
     {
+        if (src.VectorDimension == 0)
+            return list().release();
+
         list l = make_list(src.VecData, std::next(src.VecData, src.VectorDimension));
         return l.release();
     }
