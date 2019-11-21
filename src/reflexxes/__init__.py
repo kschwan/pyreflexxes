@@ -65,6 +65,14 @@ class PositionTrajectoryGenerator(object):
         return PositionTrajectory(self.rml, self.ip, self.op, self.flags)
 
     @property
+    def selection(self):
+        return self.ip.SelectionVector
+
+    @selection.setter
+    def selection(self, selection):
+        self.ip.SelectionVector = selection
+
+    @property
     def max_velocity(self):
         return self.ip.MaxVelocityVector
 
