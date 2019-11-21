@@ -59,7 +59,7 @@ class PositionTrajectoryGenerator(object):
 
     def trajectory(self, target_position, target_velocity=None, min_sync_time=None):
         self.ip.TargetPositionVector = target_position
-        self.ip.TargetVelocityVector = [0] * self.n_dof if target_velocity is None else target_velocity
+        self.ip.TargetVelocityVector = [0] * self.n_dof if not target_velocity else target_velocity
         self.ip.MinimumSynchronizationTime = 0.0 if min_sync_time is None else min_sync_time
         assert self.ip.CheckForValidity()
         return PositionTrajectory(self.rml, self.ip, self.op, self.flags)
