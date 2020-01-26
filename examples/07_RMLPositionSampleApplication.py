@@ -6,11 +6,11 @@ import reflexxes
 
 
 gen = reflexxes.PositionTrajectoryGenerator(
-    3,               # number of degrees of freedom
-    0.001,           # cycle time (in seconds)
-    [300, 100, 300], # max. vel.
-    [300, 200, 100], # max. acc.
-    [400, 300, 200]  # max. jerk
+    number_of_dofs=3,
+    cycle_time=0.001,
+    max_velocity=[300, 100, 300],
+    max_acceleration=[300, 200, 100],
+    max_jerk=[400, 300, 200]
 )
 
 # set initial values
@@ -29,8 +29,13 @@ for pos, vel, acc in gen.trajectory([-600, -200, -350], [50, -50, -200], 6.5):
     ddx.append(acc)
 
 # plot the data
+def on_key_press(event):
+    if event.key == 'escape':
+        plt.close()
+
 t = np.linspace(0, len(x) * gen.cycle_time, len(x))
 fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
+fig.canvas.mpl_connect('key_press_event', on_key_press)
 ax1.plot(t, x)
 ax1.set_ylabel('position')
 ax1.legend('123', title='DOF #')
