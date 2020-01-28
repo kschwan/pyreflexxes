@@ -7,7 +7,7 @@ import reflexxes
 
 N = 100
 
-gen = reflexxes.PositionTrajectoryGenerator(
+gen = reflexxes.extra.PositionTrajectoryGenerator(
     3,               # number of DOF
     0.001,           # cycle time [sec]
     [300, 100, 300], # max vel.

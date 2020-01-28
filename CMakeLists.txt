@@ -12,8 +12,8 @@ endif()
 if(RMLTypeII_FOUND)
   pybind11_add_module(rml_type_ii
     src/rmlerror.cpp
-    src/positiontrajectory.cpp
     src/pyreflexxes.cpp
+    src/pyreflexxes_extra.cpp
   )
   target_link_libraries(rml_type_ii PRIVATE RMLTypeII::ReflexxesTypeII)
   target_compile_definitions(rml_type_ii PRIVATE "RML_TYPE_II")
@@ -22,8 +22,8 @@ endif()
 if(RMLTypeIV_FOUND)
   pybind11_add_module(rml_type_iv
     src/rmlerror.cpp
-    src/positiontrajectory.cpp
     src/pyreflexxes.cpp
+    src/pyreflexxes_extra.cpp
   )
   target_link_libraries(rml_type_iv PRIVATE RMLTypeIV::ReflexxesTypeIV)
   target_compile_definitions(rml_type_iv PRIVATE "RML_TYPE_IV")

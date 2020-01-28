@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import reflexxes
 
 
-gen = reflexxes.PositionTrajectoryGenerator(
+gen = reflexxes.extra.PositionTrajectoryGenerator(
     number_of_dofs=3,
     cycle_time=0.001,
     max_velocity=[300, 100, 300],
@@ -18,9 +18,9 @@ gen.current_position = [100, 0, 50]
 gen.current_velocity = [100, -220, -50]
 gen.current_acceleration = [-150, 250, -50]
 
-x = [gen.current_position]
-dx = [gen.current_velocity]
-ddx = [gen.current_acceleration]
+x = [gen.current_position.tolist()]
+dx = [gen.current_velocity.tolist()]
+ddx = [gen.current_acceleration.tolist()]
 
 # generate trajectory
 for pos, vel, acc in gen.trajectory([-600, -200, -350], [50, -50, -200], 6.5):

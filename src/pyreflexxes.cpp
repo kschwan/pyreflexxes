@@ -16,13 +16,13 @@
  */
 
 #include "makelist.h"
-#include "positiontrajectory.h"
 #include "rmlerror.h"
-#include "vector_type_caster.h"
 
 #include <ReflexxesAPI.h>
 
 #include <pybind11/pybind11.h>
+
+#include <sstream>
 
 #if defined(RML_TYPE_II)
 #define MODULE_NAME rml_type_ii
@@ -30,12 +30,128 @@
 #define MODULE_NAME rml_type_iv
 #endif
 
+namespace py = pybind11;
+
+template<typename T>
+void expose_RMLVector(py::handle scope, std::string name)
+{
+    using size_type = decltype(RMLVector<T>::VectorDimension);
+    using difference_type = std::ptrdiff_t;
+
+    py::class_<RMLVector<T>>(scope, name.c_str())
+        .def(py::init([](py::sequence sequence) {
+                // Construct from a Python sequence
+                RMLVector<T> v(sequence.size());
+                auto d = v.VecData;
+
+                for (auto h : sequence)
+                    *d++ = h.cast<T>();
+
+                return v;
+            }),
+            py::arg("sequence"),
+            "A new RMLVector initialized from sequences's elements")
+        .def("__len__", &RMLVector<T>::GetVecDim)
+        .def("__getitem__",
+            [](const RMLVector<T>& self, difference_type i) {
+                if (i < 0)
+                    i += self.VectorDimension;
+
+                if (i < 0 || size_type(i) >= self.VectorDimension)
+                    throw py::index_error("RMLVector index out of range");
+
+                return self.VecData[size_type(i)];
+            })
+        .def("__setitem__",
+            [](RMLVector<T>& self, difference_type i, const T& val) {
+                if (i < 0)
+                    i += self.VectorDimension;
+
+                if (i < 0 || size_type(i) >= self.VectorDimension)
+                    throw py::index_error("RMLVector index out of range");
+
+                self.VecData[size_type(i)] = val;
+             })
+        .def("__getitem__",
+            [](const RMLVector<T>& self, py::slice slice) {
+                py::size_t start, stop, step, slicelength;
+
+                if (!slice.compute(self.VectorDimension, &start, &stop, &step, &slicelength))
+                    throw py::error_already_set();
+
+                RMLVector<T> seq(slicelength);
+
+                for (py::size_t i = 0; i < slicelength; ++i) {
+                    seq.VecData[i] = self.VecData[start];
+                    start += step;
+                }
+
+                return seq;
+            },
+            "Retrieve list elements using a slice object")
+        .def("__setitem__",
+            [](RMLVector<T>& self, py::slice slice, const RMLVector<T>& v) {
+                py::size_t start, stop, step, slicelength;
+
+                if (!slice.compute(self.VectorDimension, &start, &stop, &step, &slicelength))
+                    throw py::error_already_set();
+
+                if (slicelength != v.VectorDimension)
+                    throw py::value_error("Slices have different sizes");
+
+                for (py::size_t i = 0; i < slicelength; ++i) {
+                    self.VecData[start] = v.VecData[i];
+                    start += step;
+                }
+            })
+        .def("__setitem__",
+            [](RMLVector<T>& self, py::slice slice, const T& val) {
+                py::size_t start, stop, step, slicelength;
+
+                if (!slice.compute(self.VectorDimension, &start, &stop, &step, &slicelength))
+                    throw py::error_already_set();
+
+                for (py::size_t i = 0; i < slicelength; ++i) {
+                    self.VecData[start] = val;
+                    start += step;
+                }
+            },
+            "Assign list elements using a slice object")
+        .def("__iter__", [](const RMLVector<T>& self) {
+                return py::make_iterator(self.VecData, std::next(self.VecData, self.VectorDimension));
+            }, py::keep_alive<0, 1>())
+        .def("__eq__", &RMLVector<T>::operator==)
+        .def("__ne__", &RMLVector<T>::operator!=)
+        .def("Set", &RMLVector<T>::Set, "Fill the vector with a scalar value")
+        .def("tolist", [](const RMLVector<T>& self) {
+                return make_list(self);
+            }, "Return a copy of the vector data as a Python list")
+        .def("__repr__", [name](const RMLVector<T>& v) {
+                std::ostringstream ss;
+                ss << name << "([";
+
+                for (size_type i = 0; i < v.VectorDimension - 1; ++i)
+                    ss << v.VecData[i] << ", ";
+
+                ss << v.VecData[v.VectorDimension - 1] << "])";
+                return ss.str();
+            })
+    ;
+
+    py::implicitly_convertible<py::sequence, RMLVector<T>>();
+}
+
+void def_submodule_extra(py::module& module);
+
 PYBIND11_MODULE(MODULE_NAME, m)
 {
-    namespace py = pybind11;
     using namespace pybind11::literals;
 
     py::register_exception<RMLError>(m, "RMLError");
+
+    expose_RMLVector<bool>(m, "RMLBoolVector");
+    expose_RMLVector<double>(m, "RMLDoubleVector");
+    expose_RMLVector<int>(m, "RMLIntVector");
 
     // ReflexxesAPI
     auto reflexxes_api = py::class_<ReflexxesAPI>(m, "ReflexxesAPI")
@@ -281,31 +397,5 @@ PYBIND11_MODULE(MODULE_NAME, m)
     ;
 #endif
 
-    py::class_<PositionTrajectoryGenerator>(m, "PositionTrajectoryGenerator")
-        .def(py::init<unsigned, double>(), "number_of_dofs"_a, "cycle_time"_a)
-        .def(py::init<unsigned, double, const RMLDoubleVector&, const RMLDoubleVector&>(),
-             "number_of_dofs"_a, "cycle_time"_a, "max_velocity"_a, "max_acceleration"_a)
-        .def(py::init<unsigned, double, const RMLDoubleVector&, const RMLDoubleVector&, const RMLDoubleVector&>(),
-             "number_of_dofs"_a, "cycle_time"_a, "max_velocity"_a, "max_acceleration"_a, "max_jerk"_a)
-        .def_readonly("number_of_dofs", &PositionTrajectoryGenerator::number_of_dofs)
-        .def_readonly("cycle_time", &PositionTrajectoryGenerator::cycle_time)
-        .def("trajectory", py::overload_cast<const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
-             "target_position"_a, "min_sync_time"_a = 0.0)
-        .def("trajectory", py::overload_cast<const RMLDoubleVector&, const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
-             "target_position"_a, "target_velocity"_a, "min_sync_time"_a = 0.0)
-        .def_property("current_position",
-            [](const PositionTrajectoryGenerator& self) -> const auto& { return *self.ip.CurrentPositionVector; },
-            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentPositionVector = v; })
-        .def_property("current_velocity",
-            [](const PositionTrajectoryGenerator& self) -> const auto& { return *self.ip.CurrentVelocityVector; },
-            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentVelocityVector = v; })
-        .def_property("current_acceleration",
-            [](const PositionTrajectoryGenerator& self) -> const auto& { return *self.ip.CurrentAccelerationVector; },
-            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentAccelerationVector = v; })
-    ;
-
-    py::class_<PositionTrajectoryIterator>(m, "PositionTrajectoryIterator")
-        .def("__next__", &PositionTrajectoryIterator::next)
-        .def("__iter__", [](PositionTrajectoryIterator& self) -> auto& { return self; })
-    ;
+    def_submodule_extra(m);
 }
