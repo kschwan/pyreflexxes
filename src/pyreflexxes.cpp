@@ -123,6 +123,9 @@ void expose_RMLVector(py::handle scope, std::string name)
         .def("__eq__", &RMLVector<T>::operator==)
         .def("__ne__", &RMLVector<T>::operator!=)
         .def("Set", &RMLVector<T>::Set, "Fill the vector with a scalar value")
+        .def("copy", [](const RMLVector<T>& self) {
+                return RMLVector<T>(self);
+            }, "Return a copy of the vector")
         .def("tolist", [](const RMLVector<T>& self) {
                 return make_list(self);
             }, "Return a copy of the vector data as a Python list")
