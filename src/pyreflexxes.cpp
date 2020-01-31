@@ -35,13 +35,14 @@ namespace py = pybind11;
 template<typename T>
 void expose_RMLVector(py::handle scope, std::string name)
 {
-    using size_type = decltype(RMLVector<T>::VectorDimension);
+    using Vec = RMLVector<T>;
+    using size_type = decltype(Vec::VectorDimension);
     using difference_type = std::ptrdiff_t;
 
-    py::class_<RMLVector<T>>(scope, name.c_str())
+    py::class_<Vec>(scope, name.c_str())
         .def(py::init([](py::sequence sequence) {
                 // Construct from a Python sequence
-                RMLVector<T> v(sequence.size());
+                Vec v(sequence.size());
                 auto d = v.VecData;
 
                 for (auto h : sequence)
@@ -51,9 +52,9 @@ void expose_RMLVector(py::handle scope, std::string name)
             }),
             py::arg("sequence"),
             "A new RMLVector initialized from sequences's elements")
-        .def("__len__", &RMLVector<T>::GetVecDim)
+        .def("__len__", &Vec::GetVecDim)
         .def("__getitem__",
-            [](const RMLVector<T>& self, difference_type i) {
+            [](const Vec& self, difference_type i) {
                 if (i < 0)
                     i += self.VectorDimension;
 
@@ -63,7 +64,7 @@ void expose_RMLVector(py::handle scope, std::string name)
                 return self.VecData[size_type(i)];
             })
         .def("__setitem__",
-            [](RMLVector<T>& self, difference_type i, const T& val) {
+            [](Vec& self, difference_type i, const T& val) {
                 if (i < 0)
                     i += self.VectorDimension;
 
@@ -73,13 +74,13 @@ void expose_RMLVector(py::handle scope, std::string name)
                 self.VecData[size_type(i)] = val;
              })
         .def("__getitem__",
-            [](const RMLVector<T>& self, py::slice slice) {
+            [](const Vec& self, py::slice slice) {
                 py::size_t start, stop, step, slicelength;
 
                 if (!slice.compute(self.VectorDimension, &start, &stop, &step, &slicelength))
                     throw py::error_already_set();
 
-                RMLVector<T> seq(slicelength);
+                Vec seq(slicelength);
 
                 for (py::size_t i = 0; i < slicelength; ++i) {
                     seq.VecData[i] = self.VecData[start];
@@ -90,7 +91,7 @@ void expose_RMLVector(py::handle scope, std::string name)
             },
             "Retrieve list elements using a slice object")
         .def("__setitem__",
-            [](RMLVector<T>& self, py::slice slice, const RMLVector<T>& v) {
+            [](Vec& self, py::slice slice, const Vec& v) {
                 py::size_t start, stop, step, slicelength;
 
                 if (!slice.compute(self.VectorDimension, &start, &stop, &step, &slicelength))
@@ -105,7 +106,7 @@ void expose_RMLVector(py::handle scope, std::string name)
                 }
             })
         .def("__setitem__",
-            [](RMLVector<T>& self, py::slice slice, const T& val) {
+            [](Vec& self, py::slice slice, const T& val) {
                 py::size_t start, stop, step, slicelength;
 
                 if (!slice.compute(self.VectorDimension, &start, &stop, &step, &slicelength))
@@ -117,32 +118,28 @@ void expose_RMLVector(py::handle scope, std::string name)
                 }
             },
             "Assign list elements using a slice object")
-        .def("__iter__", [](const RMLVector<T>& self) {
+        .def("__iter__", [](const Vec& self) {
                 return py::make_iterator(self.VecData, std::next(self.VecData, self.VectorDimension));
             }, py::keep_alive<0, 1>())
-        .def("__eq__", &RMLVector<T>::operator==)
-        .def("__ne__", &RMLVector<T>::operator!=)
-        .def("Set", &RMLVector<T>::Set, "Fill the vector with a scalar value")
-        .def("fill", &RMLVector<T>::Set, "Fill the vector with a scalar value")
-        .def("copy", [](const RMLVector<T>& self) {
-                return RMLVector<T>(self);
-            }, "Return a copy of the vector")
-        .def("tolist", [](const RMLVector<T>& self) {
-                return make_list(self);
-            }, "Return a copy of the vector data as a Python list")
-        .def("__repr__", [name](const RMLVector<T>& v) {
+        .def("__eq__", &Vec::operator==)
+        .def("__ne__", &Vec::operator!=)
+        .def("Set", &Vec::Set, "Fill the vector with a scalar value")
+        .def("fill", &Vec::Set, "Fill the vector with a scalar value")
+        .def("copy", [](const Vec& self) { return Vec(self); }, "Return a copy of the vector")
+        .def("tolist", [](const Vec& self) { return make_list(self); }, "Return a copy of the vector data as a Python list")
+        .def("__repr__", [name](const Vec& self) {
                 std::ostringstream ss;
                 ss << name << "([";
 
-                for (size_type i = 0; i < v.VectorDimension - 1; ++i)
-                    ss << v.VecData[i] << ", ";
+                for (size_type i = 0; i < self.VectorDimension - 1; ++i)
+                    ss << self.VecData[i] << ", ";
 
-                ss << v.VecData[v.VectorDimension - 1] << "])";
+                ss << self.VecData[self.VectorDimension - 1] << "])";
                 return ss.str();
             })
     ;
 
-    py::implicitly_convertible<py::sequence, RMLVector<T>>();
+    py::implicitly_convertible<py::sequence, Vec>();
 }
 
 void def_submodule_extra(py::module& module);
@@ -249,33 +246,33 @@ PYBIND11_MODULE(MODULE_NAME, m)
         .def_readonly("NumberOfDOFs", &RMLInputParameters::NumberOfDOFs)
         .def_readwrite("MinimumSynchronizationTime", &RMLInputParameters::MinimumSynchronizationTime)
         .def_property("SelectionVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.SelectionVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.SelectionVector; },
             [](RMLInputParameters& self, const RMLBoolVector& v) { *self.SelectionVector = v; })
         .def_property("CurrentPositionVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.CurrentPositionVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.CurrentPositionVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentPositionVector = v; })
         .def_property("CurrentVelocityVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.CurrentVelocityVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.CurrentVelocityVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentVelocityVector = v; })
         .def_property("CurrentAccelerationVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.CurrentAccelerationVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.CurrentAccelerationVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.CurrentAccelerationVector = v; })
         .def_property("MaxAccelerationVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.MaxAccelerationVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.MaxAccelerationVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxAccelerationVector = v; })
         .def_property("MaxJerkVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.MaxJerkVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.MaxJerkVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxJerkVector = v; })
         .def_property("TargetVelocityVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.TargetVelocityVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.TargetVelocityVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.TargetVelocityVector = v; })
 #if defined(RML_TYPE_IV)
         .def_readwrite("OverrideValue", &RMLInputParameters::OverrideValue)
         .def_property("MaxPositionVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.MaxPositionVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.MaxPositionVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MaxPositionVector = v; })
         .def_property("MinPositionVector",
-            [](const RMLInputParameters& self) -> const auto& { return *self.MinPositionVector; },
+            [](RMLInputParameters& self) -> auto& { return *self.MinPositionVector; },
             [](RMLInputParameters& self, const RMLDoubleVector& v) { *self.MinPositionVector = v; })
 #endif
     ;
@@ -302,13 +299,13 @@ PYBIND11_MODULE(MODULE_NAME, m)
         .def("CheckForValidity", [](const RMLPositionInputParameters& self) { return self.CheckForValidity(); })
 #endif
         .def_property("MaxVelocityVector",
-            [](const RMLPositionInputParameters& self) -> const auto& { return *self.MaxVelocityVector; },
+            [](RMLPositionInputParameters& self) -> auto& { return *self.MaxVelocityVector; },
             [](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.MaxVelocityVector = v; })
         .def_property("TargetPositionVector",
-            [](const RMLPositionInputParameters& self) -> const auto& { return *self.TargetPositionVector; },
+            [](RMLPositionInputParameters& self) -> auto& { return *self.TargetPositionVector; },
             [](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.TargetPositionVector = v; })
         .def_property("AlternativeTargetVelocityVector",
-            [](const RMLPositionInputParameters& self) -> const auto& { return *self.AlternativeTargetVelocityVector; },
+            [](RMLPositionInputParameters& self) -> auto& { return *self.AlternativeTargetVelocityVector; },
             [](RMLPositionInputParameters& self, const RMLDoubleVector& v) { *self.AlternativeTargetVelocityVector = v; })
     ;
 
@@ -329,14 +326,22 @@ PYBIND11_MODULE(MODULE_NAME, m)
         .def_readonly("NumberOfDOFs", &RMLOutputParameters::NumberOfDOFs)
         .def_readonly("DOFWithTheGreatestExecutionTime", &RMLOutputParameters::DOFWithTheGreatestExecutionTime)
         .def_readonly("SynchronizationTime", &RMLOutputParameters::SynchronizationTime)
-        .def_property_readonly("NewPositionVector", [](const RMLOutputParameters& self) -> const auto& { return *self.NewPositionVector; })
-        .def_property_readonly("NewVelocityVector", [](const RMLOutputParameters& self) -> const auto& { return *self.NewVelocityVector; })
-        .def_property_readonly("NewAccelerationVector", [](const RMLOutputParameters& self) -> const auto& { return *self.NewAccelerationVector; })
-        .def_property_readonly("MinExtremaTimesVector", [](const RMLOutputParameters& self) -> const auto& { return *self.MinExtremaTimesVector; })
-        .def_property_readonly("MaxExtremaTimesVector", [](const RMLOutputParameters& self) -> const auto& { return *self.MaxExtremaTimesVector; })
-        .def_property_readonly("MinPosExtremaPositionVectorOnly", [](const RMLOutputParameters& self) -> const auto& { return *self.MinPosExtremaPositionVectorOnly; })
-        .def_property_readonly("MaxPosExtremaPositionVectorOnly", [](const RMLOutputParameters& self) -> const auto& { return *self.MaxPosExtremaPositionVectorOnly; })
-        .def_property_readonly("ExecutionTimes", [](const RMLOutputParameters& self) -> const auto& { return *self.ExecutionTimes; })
+        .def_property_readonly("NewPositionVector",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.NewPositionVector; })
+        .def_property_readonly("NewVelocityVector",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.NewVelocityVector; })
+        .def_property_readonly("NewAccelerationVector",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.NewAccelerationVector; })
+        .def_property_readonly("MinExtremaTimesVector",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.MinExtremaTimesVector; })
+        .def_property_readonly("MaxExtremaTimesVector",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.MaxExtremaTimesVector; })
+        .def_property_readonly("MinPosExtremaPositionVectorOnly",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.MinPosExtremaPositionVectorOnly; })
+        .def_property_readonly("MaxPosExtremaPositionVectorOnly",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.MaxPosExtremaPositionVectorOnly; })
+        .def_property_readonly("ExecutionTimes",
+            [](const RMLOutputParameters& self) -> const auto& { return *self.ExecutionTimes; })
         .def_property_readonly("MinPosExtremaPositionVectorArray",
             [](const RMLOutputParameters& self) { return make_list(self.MinPosExtremaPositionVectorArray, std::next(self.MinPosExtremaPositionVectorArray, self.NumberOfDOFs)); })
         .def_property_readonly("MinPosExtremaVelocityVectorArray",
@@ -374,20 +379,35 @@ PYBIND11_MODULE(MODULE_NAME, m)
     // RMLVelocityOutputParameters
     py::class_<RMLVelocityOutputParameters, RMLOutputParameters>(m, "RMLVelocityOutputParameters")
         .def(py::init<unsigned>())
-        .def_property_readonly("PositionValuesAtTargetVelocity", [](const RMLVelocityOutputParameters& self) -> const auto& { return *self.PositionValuesAtTargetVelocity; })
+        .def_property_readonly("PositionValuesAtTargetVelocity",
+            [](const RMLVelocityOutputParameters& self) -> const auto& { return *self.PositionValuesAtTargetVelocity; })
     ;
 
 #if defined(RML_TYPE_IV)
     // RMLPolynomial
     py::class_<RMLPolynomial>(m, "RMLPolynomial")
         .def(py::init<>())
-        .def_property_readonly("PositionPolynomialCoefficients", // TODO should not be readonly?
-            [](const RMLPolynomial& self) { return make_list(std::begin(self.PositionPolynomialCoefficients), std::end(self.PositionPolynomialCoefficients)); })
+        .def_property_readonly("PositionPolynomialCoefficients",
+            [](const RMLPolynomial& self) { return make_list(self.PositionPolynomialCoefficients); })
         .def_property_readonly("VelocityPolynomialCoefficients",
-            [](const RMLPolynomial& self) { return make_list(std::begin(self.VelocityPolynomialCoefficients), std::end(self.VelocityPolynomialCoefficients)); })
+            [](const RMLPolynomial& self) { return make_list(self.VelocityPolynomialCoefficients); })
         .def_property_readonly("AccelerationPolynomialCoefficients",
-            [](const RMLPolynomial& self) { return make_list(std::begin(self.AccelerationPolynomialCoefficients), std::end(self.AccelerationPolynomialCoefficients)); })
+            [](const RMLPolynomial& self) { return make_list(self.AccelerationPolynomialCoefficients); })
         .def_readonly("Time_ValidUntil", &RMLPolynomial::Time_ValidUntil)
+        .def("__str__", [](const RMLPolynomial& self) {
+                std::ostringstream ss;
+                ss << "RMLPolynomial(";
+                ss << std::showpos;
+                auto& p = self.PositionPolynomialCoefficients;
+                ss << "p(t)=" << p[3] << "^3" << p[2] << "^2" << p[1] << p[0] << ", ";
+                auto& v = self.VelocityPolynomialCoefficients;
+                ss << "v(t)=" << v[2] << "^2" << v[1] << v[0] << ", ";
+                auto& a = self.AccelerationPolynomialCoefficients;
+                ss << "a(t)=" << a[1] << a[0]<< ", ";
+                ss << std::noshowpos;
+                ss << "valid until " << self.Time_ValidUntil << " sec)";
+                return ss.str();
+            })
     ;
 
     // RMLOutputPolynomials

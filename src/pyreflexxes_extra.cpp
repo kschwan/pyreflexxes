@@ -1,3 +1,20 @@
+/*
+ * Copyright 2019 Kim Lindberg Schwaner <kils@mmmi.sdu.dk>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "makelist.h"
 #include "rmlerror.h"
 
@@ -139,24 +156,26 @@ void def_submodule_extra(py::module& module)
              "number_of_dofs"_a, "cycle_time"_a, "max_velocity"_a, "max_acceleration"_a, "max_jerk"_a)
         .def_readonly("number_of_dofs", &PositionTrajectoryGenerator::number_of_dofs)
         .def_readonly("cycle_time", &PositionTrajectoryGenerator::cycle_time)
-        .def_readwrite("rml", &PositionTrajectoryGenerator::rml)
-        .def_readwrite("ip", &PositionTrajectoryGenerator::ip)
-        .def_readwrite("op", &PositionTrajectoryGenerator::op)
-        .def_readwrite("flags", &PositionTrajectoryGenerator::flags)
-        .def("trajectory", py::overload_cast<const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
+        .def_readonly("rml", &PositionTrajectoryGenerator::rml)
+        .def_readonly("ip", &PositionTrajectoryGenerator::ip)
+        .def_readonly("op", &PositionTrajectoryGenerator::op)
+        .def_readonly("flags", &PositionTrajectoryGenerator::flags)
+        .def("trajectory",
+             py::overload_cast<const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
              "target_position"_a, "min_sync_time"_a = 0.0,
              py::keep_alive<0, 1>())
-        .def("trajectory", py::overload_cast<const RMLDoubleVector&, const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
+        .def("trajectory",
+             py::overload_cast<const RMLDoubleVector&, const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
              "target_position"_a, "target_velocity"_a, "min_sync_time"_a = 0.0,
              py::keep_alive<0, 1>())
         .def_property("current_position",
-            [](const PositionTrajectoryGenerator& self) -> const auto& { return *self.ip.CurrentPositionVector; },
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.CurrentPositionVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentPositionVector = v; })
         .def_property("current_velocity",
-            [](const PositionTrajectoryGenerator& self) -> const auto& { return *self.ip.CurrentVelocityVector; },
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.CurrentVelocityVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentVelocityVector = v; })
         .def_property("current_acceleration",
-            [](const PositionTrajectoryGenerator& self) -> const auto& { return *self.ip.CurrentAccelerationVector; },
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.CurrentAccelerationVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentAccelerationVector = v; })
     ;
 }
