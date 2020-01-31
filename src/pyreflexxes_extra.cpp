@@ -116,8 +116,14 @@ struct PositionTrajectoryGenerator
         ip.SelectionVector->Set(true);
     }
 
-    PositionTrajectoryIterator trajectory(const RMLDoubleVector& target_position,
-                                          double min_sync_time = 0.0)
+    auto trajectory(double min_sync_time = 0.0)
+    {
+        ip.MinimumSynchronizationTime = min_sync_time;
+        return PositionTrajectoryIterator(rml, ip, op, flags);
+    }
+
+    auto trajectory(const RMLDoubleVector& target_position,
+                    double min_sync_time = 0.0)
     {
         *ip.TargetPositionVector = target_position;
         ip.TargetVelocityVector->Set(0);
@@ -125,9 +131,9 @@ struct PositionTrajectoryGenerator
         return PositionTrajectoryIterator(rml, ip, op, flags);
     }
 
-    PositionTrajectoryIterator trajectory(const RMLDoubleVector& target_position,
-                                          const RMLDoubleVector& target_velocity,
-                                          double min_sync_time = 0.0)
+    auto trajectory(const RMLDoubleVector& target_position,
+                    const RMLDoubleVector& target_velocity,
+                    double min_sync_time = 0.0)
     {
         *ip.TargetPositionVector = target_position;
         *ip.TargetVelocityVector = target_velocity;
@@ -161,14 +167,19 @@ void def_submodule_extra(py::module& module)
         .def_readonly("op", &PositionTrajectoryGenerator::op)
         .def_readonly("flags", &PositionTrajectoryGenerator::flags)
         .def("trajectory",
+             py::overload_cast<double>(&PositionTrajectoryGenerator::trajectory),
+             "min_sync_time"_a = 0.0,
+             "Iterator over the states of motion to the target currently set for the trajectory generator",
+             py::keep_alive<0, 1>())
+        .def("trajectory",
              py::overload_cast<const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
              "target_position"_a, "min_sync_time"_a = 0.0,
-             "Make an iterator returning the states of motion to target position (assuming target velocity to be zero)",
+             "Iterator over the states of motion to the target position (target velocity is set to zero)",
              py::keep_alive<0, 1>())
         .def("trajectory",
              py::overload_cast<const RMLDoubleVector&, const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
              "target_position"_a, "target_velocity"_a, "min_sync_time"_a = 0.0,
-             "Make an iterator returning the states of motion to target position",
+             "Iterator over the states of motion to the target position- and velocity",
              py::keep_alive<0, 1>())
         .def_property("selection",
             [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.SelectionVector; },
@@ -188,6 +199,9 @@ void def_submodule_extra(py::module& module)
         .def_property("max_acceleration",
             [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.MaxAccelerationVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.MaxAccelerationVector = v; })
+        .def_property("max_jerk",
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.MaxJerkVector; },
+            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.MaxJerkVector = v; })
         .def_property("target_position",
             [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.TargetPositionVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.TargetPositionVector = v; })
