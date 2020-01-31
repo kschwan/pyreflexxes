@@ -399,11 +399,11 @@ PYBIND11_MODULE(MODULE_NAME, m)
                 ss << "RMLPolynomial(";
                 ss << std::showpos;
                 auto& p = self.PositionPolynomialCoefficients;
-                ss << "p(t)=" << p[3] << "^3" << p[2] << "^2" << p[1] << p[0] << ", ";
+                ss << "p(t)=" << p[3] << "t^3" << p[2] << "t^2" << p[1] << "t" << p[0] << ", ";
                 auto& v = self.VelocityPolynomialCoefficients;
-                ss << "v(t)=" << v[2] << "^2" << v[1] << v[0] << ", ";
+                ss << "v(t)=" << v[2] << "t^2" << v[1] << "t" << v[0] << ", ";
                 auto& a = self.AccelerationPolynomialCoefficients;
-                ss << "a(t)=" << a[1] << a[0]<< ", ";
+                ss << "a(t)=" << a[1] << "t" << a[0]<< ", ";
                 ss << std::noshowpos;
                 ss << "valid until " << self.Time_ValidUntil << " sec)";
                 return ss.str();
