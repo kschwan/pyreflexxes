@@ -143,7 +143,7 @@ void def_submodule_extra(py::module& module)
     auto m = module.def_submodule("extra");
 
     py::class_<PositionTrajectoryIterator>(m, "PositionTrajectoryIterator")
-        .def("__next__", &PositionTrajectoryIterator::next)
+        .def("__next__", &PositionTrajectoryIterator::next, "Compute the next state of motion")
         .def("__iter__", [](PositionTrajectoryIterator& self) -> auto& { return self; })
     ;
 
@@ -163,11 +163,16 @@ void def_submodule_extra(py::module& module)
         .def("trajectory",
              py::overload_cast<const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
              "target_position"_a, "min_sync_time"_a = 0.0,
+             "Make an iterator returning the states of motion to target position (assuming target velocity to be zero)",
              py::keep_alive<0, 1>())
         .def("trajectory",
              py::overload_cast<const RMLDoubleVector&, const RMLDoubleVector&, double>(&PositionTrajectoryGenerator::trajectory),
              "target_position"_a, "target_velocity"_a, "min_sync_time"_a = 0.0,
+             "Make an iterator returning the states of motion to target position",
              py::keep_alive<0, 1>())
+        .def_property("selection",
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.SelectionVector; },
+            [](PositionTrajectoryGenerator& self, const RMLBoolVector& v) { *self.ip.SelectionVector = v; })
         .def_property("current_position",
             [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.CurrentPositionVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentPositionVector = v; })
@@ -177,5 +182,17 @@ void def_submodule_extra(py::module& module)
         .def_property("current_acceleration",
             [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.CurrentAccelerationVector; },
             [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.CurrentAccelerationVector = v; })
+        .def_property("max_velocity",
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.MaxVelocityVector; },
+            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.MaxVelocityVector = v; })
+        .def_property("max_acceleration",
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.MaxAccelerationVector; },
+            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.MaxAccelerationVector = v; })
+        .def_property("target_position",
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.TargetPositionVector; },
+            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.TargetPositionVector = v; })
+        .def_property("target_velocity",
+            [](PositionTrajectoryGenerator& self) -> auto& { return *self.ip.TargetVelocityVector; },
+            [](PositionTrajectoryGenerator& self, const RMLDoubleVector& v) { *self.ip.TargetVelocityVector = v; })
     ;
 }
