@@ -8,4 +8,4 @@ be built and installed with e.g.
 This library depends on
 - python-dev
 - pybind11
-- libReflexxesTypeII or libReflexxesTypeIV
+- libReflexxesTypeII (see [RMLTypeII](https://github.com/kschwan/RMLTypeII)) or libReflexxesTypeIV
